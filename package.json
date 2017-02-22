@@ -1,0 +1,21 @@
+{
+  "name": "book-app",
+  "version": "1.0.0",
+  "description": "A boot trading app from the fcc fullstack challenges",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "book",
+    "trading",
+    "mern",
+    "fcc"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MarkoN95/Book-App.git"
+  },
+  "author": "MarkoN95",
+  "license": "MIT"
+}
