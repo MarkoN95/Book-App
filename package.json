@@ -17,5 +17,9 @@
     "url": "https://github.com/MarkoN95/Book-App.git"
   },
   "author": "MarkoN95",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^3.16.0",
+    "eslint-plugin-react": "^6.10.0"
+  }
 }
