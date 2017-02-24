@@ -29,10 +29,10 @@ app.use(session({
     mongooseConnection: mongoose.connection
   }),
   cookie: {
-    maxAge: 12 * 24 * 60 * 60 * 1000, //2 weeks
-    resave: false,
-    saveUninitialized: false
-  }
+    maxAge: 12 * 24 * 60 * 60 * 1000 //2 weeks
+  },
+  resave: false,
+  saveUninitialized: false
 }));
 
 authConfig(passport, User);
