@@ -73,3 +73,18 @@ exports.loadImages = function({ include, exclude, options }) {
     }
   };
 };
+
+exports.loadPug = function({ include, exclude }) {
+  return {
+    module: {
+      rules: [
+        {
+          test: /\.pug$/,
+          include,
+          exclude,
+          loader: "pug-loader"
+        }
+      ]
+    }
+  };
+};

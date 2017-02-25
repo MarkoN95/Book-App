@@ -19,6 +19,6 @@ exports.devServer = function({ host, port, proxy }) {
 
 exports.sourceMap = function({ type }) {
   return {
-    devTool: type
+    devtool: type
   };
 };

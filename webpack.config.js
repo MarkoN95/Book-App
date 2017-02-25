@@ -1,10 +1,10 @@
 const path = require("path");
 const merge = require("webpack-merge");
-
-const dev = require("./config/webpack_modules/dev");
-const loaders = require("./config/webpack_modules/loaders");
+const { dev, loaders, plugins } = require("./config/parts");
 
 const PATHS = {
+  template: path.join(__dirname, "client", "index.pug"),
+  client: path.join(__dirname, "client"),
   app: path.join(__dirname, "client", "js"),
   server: path.join(__dirname, "server.js"),
   build: path.join(__dirname, "build")
@@ -29,15 +29,15 @@ const client = {
     return merge(
       common,
       {
-        entry: {
-          path: ["react-hot-loader/patch", PATHS.app]
-        },
+        entry: ["react-hot-loader/patch", PATHS.app],
         output: {
           devtoolModuleFilenameTemplate: "webpack:///[resource-path]",
           path: path.join(PATHS.build, "client"),
           filename: "[name].js"
         }
       },
+      loaders.loadPug({ include: PATHS.client }),
+      plugins.HTMLPlugin({ template: PATHS.template }),
       dev.devServer({
         host: process.env.HOST,
         port: process.env.PORT,
@@ -45,7 +45,7 @@ const client = {
           "/api": "http://localhost:8124"
         }
       }),
-      loaders.loadCSS(),
+      loaders.loadCSS({ include: path.join(PATHS.client, "css") }),
       dev.sourceMap({ type: "cheap-module-eval-source-map" })
     );
   },
@@ -74,6 +74,8 @@ const server = {
 
 module.exports = function(env) {
   if(env === "development") {
+    process.env.BABEL_ENV = env;
+
     return client.development();
   }
 
