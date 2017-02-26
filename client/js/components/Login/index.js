@@ -3,7 +3,7 @@ const React = require("react");
 const About = React.createClass({
   render: function() {
     return (
-      <h3>About Page</h3>
+      <h3>Login</h3>
     );
   }
 });

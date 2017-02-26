@@ -30,6 +30,7 @@ render(routes);
 
 if(module.hot) {
   module.hot.accept("./routes", () => {
-    render(routes);
+    const nextRoutes = require("./routes");
+    render(nextRoutes);
   });
 }

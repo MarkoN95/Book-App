@@ -8,7 +8,18 @@ exports.loadCSS = function({ include, exclude }) {
           test: /\.css$/,
           include,
           exclude,
-          use: ["style-loader", "css-loader"]
+          use: [
+            {
+              loader: "style-loader"
+            },
+            {
+              loader: "css-loader",
+              query: {
+                modules: true,
+                localIdentName: "[local]_[hash:base64:5]"
+              }
+            }
+          ]
         }
       ]
     }

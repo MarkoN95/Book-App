@@ -1,15 +1,17 @@
 const React = require("react");
-const { Route } = require("react-router");
+const { Route, IndexRoute } = require("react-router");
 
 const Main = require("./components/Main");
-const About = require("./components/About");
 const Home = require("./components/Home");
+const Login = require("./components/Login");
+const Register = require("./components/Register");
 
 const routes = function() {
   return (
     <Route path="/" component={Main}>
-      <Route path="/about" component={About}/>
-      <Route path="/home" component={Home}/>
+      <IndexRoute component={Home}/>
+      <Route path="/login" component={Login}/>
+      <Route path="/register" component={Register}/>
     </Route>
   );
 };

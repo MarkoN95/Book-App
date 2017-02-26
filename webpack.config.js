@@ -45,7 +45,7 @@ const client = {
           "/api": "http://localhost:8124"
         }
       }),
-      loaders.loadCSS({ include: path.join(PATHS.client, "css") }),
+      loaders.loadCSS({ include: PATHS.client }),
       dev.sourceMap({ type: "cheap-module-eval-source-map" })
     );
   },
