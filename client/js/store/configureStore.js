@@ -6,15 +6,17 @@ const rootReducer = require("../reducers");
 function configureStore(initialState) {
   var middlewares = [];
   var store;
-  var composeDev;
+  var devtools;
 
   if(process.env.NODE_ENV !== "production") {
 
+    var w = window;
     middlewares.push(reduxImmutableStateInvariant());
-    composeDev = (window && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE_) || compose;
+    devtools = w && w.devToolsExtension ? w.devToolsExtension() : f => f;
 
-    store = createStore(rootReducer, initialState, composeDev(
-        applyMiddleware.apply(this, middlewares)
+    store = createStore(rootReducer, initialState, compose(
+        applyMiddleware.apply(this, middlewares),
+        devtools
     ));
 
     if(module.hot) {
