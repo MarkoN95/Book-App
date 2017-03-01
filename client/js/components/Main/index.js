@@ -3,6 +3,7 @@ const { Link } = require("react-router");
 const { Navbar, Nav, NavItem } = require("react-bootstrap");
 const { LinkContainer } = require("react-router-bootstrap");
 
+require("../../../css/index.css");
 const styles = require("./styles.css");
 
 const Main = React.createClass({

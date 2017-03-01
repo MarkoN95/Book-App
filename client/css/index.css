@@ -1,3 +1,10 @@
-body {
-  background-color: lightsteelblue;
+:global .btnInverse {
+  background-color: #222;
+  border-color: rgb(8, 8, 8);
+  color: rgb(157, 157, 157);
+}
+
+:global .btnInverse:hover {
+  background-color: #222;
+  color: #fff;
 }
