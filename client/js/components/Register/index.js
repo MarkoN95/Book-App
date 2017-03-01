@@ -1,10 +1,33 @@
 const React = require("react");
+const { connect } = require("react-redux");
 const { Grid, Row, Col, Form, FormGroup, FormControl, Button } = require("react-bootstrap");
 
+const actions = require("../../actions/update");
 const styles = require("./styles.css");
 
-const Home = React.createClass({
+const Register = React.createClass({
+  propTypes: {
+    updateInput: React.PropTypes.func.isRequired,
+    username: React.PropTypes.string.isRequired,
+    email: React.PropTypes.string.isRequired,
+    password: React.PropTypes.string.isRequired,
+    confirm_password: React.PropTypes.string.isRequired,
+    full_name: React.PropTypes.string.isRequired,
+    city: React.PropTypes.string.isRequired,
+    state: React.PropTypes.string.isRequired
+  },
   render: function() {
+    var {
+      updateInput,
+      username,
+      email,
+      password,
+      confirm_password,
+      full_name,
+      city,
+      state
+    } = this.props;
+    
     return (
       <Grid fluid>
         <Row>
@@ -17,6 +40,8 @@ const Home = React.createClass({
                   type="text"
                   name="username"
                   placeholder="username"
+                  value={username}
+                  onChange={updateInput}
                 />
               </FormGroup>
               <FormGroup>
@@ -24,6 +49,8 @@ const Home = React.createClass({
                   type="email"
                   name="email"
                   placeholder="email address"
+                  value={email}
+                  onChange={updateInput}
                 />
               </FormGroup>
               <FormGroup>
@@ -31,6 +58,8 @@ const Home = React.createClass({
                   type="password"
                   name="password"
                   placeholder="password"
+                  value={password}
+                  onChange={updateInput}
                 />
               </FormGroup>
               <FormGroup>
@@ -38,6 +67,8 @@ const Home = React.createClass({
                   type="password"
                   name="confirm_password"
                   placeholder="confirm password"
+                  value={confirm_password}
+                  onChange={updateInput}
                 />
               </FormGroup>
 
@@ -49,6 +80,8 @@ const Home = React.createClass({
                   type="text"
                   name="full_name"
                   placeholder="full name"
+                  value={full_name}
+                  onChange={updateInput}
                 />
               </FormGroup>
               <FormGroup>
@@ -56,6 +89,8 @@ const Home = React.createClass({
                   type="text"
                   name="city"
                   placeholder="city"
+                  value={city}
+                  onChange={updateInput}
                 />
               </FormGroup>
               <FormGroup>
@@ -63,6 +98,8 @@ const Home = React.createClass({
                   type="text"
                   name="state"
                   placeholder="state"
+                  value={state}
+                  onChange={updateInput}
                 />
               </FormGroup>
 
@@ -77,4 +114,27 @@ const Home = React.createClass({
   }
 });
 
-module.exports = Home;
+const mapStateToProps = function(state) {
+  return {
+    username: state.register.username,
+    email: state.register.email,
+    password: state.register.password,
+    confirm_password: state.register.confirm_password,
+    full_name: state.register.full_name,
+    city: state.register.city,
+    state: state.register.state
+  };
+};
+
+const mapDispatchToProps = function(dispatch) {
+  return {
+    updateInput: function(e) {
+      dispatch(actions.updateFormInput("register", e.target.name, e.target.value));
+    }
+  };
+};
+
+module.exports = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Register);

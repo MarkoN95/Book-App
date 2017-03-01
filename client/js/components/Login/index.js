@@ -1,10 +1,23 @@
 const React = require("react");
+const { connect } = require("react-redux");
 const { Grid, Row, Col, Form, FormGroup, FormControl, ControlLabel, Button } = require("react-bootstrap");
 
+const actions = require("../../actions/update");
 const styles = require("./styles.css");
 
-const About = React.createClass({
+const Login = React.createClass({
+  propTypes: {
+    updateInput: React.PropTypes.func.isRequired,
+    username: React.PropTypes.string.isRequired,
+    password: React.PropTypes.string.isRequired
+  },
   render: function() {
+    var {
+      username,
+      password,
+      updateInput
+    } = this.props;
+    
     return (
       <Grid fluid>
         <Row>
@@ -16,6 +29,8 @@ const About = React.createClass({
                 <FormControl
                   type="text"
                   name="username"
+                  value={username}
+                  onChange={updateInput}
                 />
               </FormGroup>
               <FormGroup>
@@ -23,6 +38,8 @@ const About = React.createClass({
                 <FormControl
                   type="password"
                   name="password"
+                  value={password}
+                  onChange={updateInput}
                 />
               </FormGroup>
               <Button type="submit" className="btnInverse">
@@ -57,4 +74,22 @@ const About = React.createClass({
   }
 });
 
-module.exports = About;
+const mapStateToProps = function(state) {
+  return {
+    username: state.login.username,
+    password: state.login.password
+  };
+};
+
+const mapDispatchToProps = function(dispatch) {
+  return {
+    updateInput: function(e) {
+      dispatch(actions.updateFormInput("login", e.target.name, e.target.value));
+    }
+  };
+};
+
+module.exports = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Login);
