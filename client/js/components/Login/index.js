@@ -17,9 +17,9 @@ const Login = React.createClass({
       password,
       updateInput
     } = this.props;
-    
+
     return (
-      <Grid fluid>
+      <Grid className="mainGrid" fluid>
         <Row>
           <Col md={4} sm={8} xs={10} mdOffset={4} smOffset={2} xsOffset={1}>
             <h3 className="text-center">Native Login</h3>
