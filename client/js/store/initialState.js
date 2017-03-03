@@ -1,8 +1,18 @@
+function createRequest() {
+  return {
+    isPending: false,
+    success: null,
+    error: null,
+    data: null
+  };
+}
+
 module.exports = {
   login: {
     username: "",
     password: ""
   },
+  loginRequest: createRequest(),
   register: {
     username: "",
     email: "",
@@ -11,5 +21,6 @@ module.exports = {
     full_name: "",
     city: "",
     state: ""
-  }
+  },
+  registerRequest: createRequest()
 };
