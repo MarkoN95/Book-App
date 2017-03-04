@@ -12,3 +12,7 @@
 :global .mainGrid {
   margin-bottom: 50px;
 }
+
+:global .form-control-static {
+  color: #ff0000;
+}

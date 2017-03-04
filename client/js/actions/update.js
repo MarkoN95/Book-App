@@ -1,4 +1,4 @@
-const types = require("./types.js");
+const types = require("./types");
 
 module.exports = {
   updateFormInput: function(form/*login or register*/, field, value) {

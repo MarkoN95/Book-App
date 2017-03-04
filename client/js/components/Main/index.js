@@ -1,16 +1,20 @@
 const React = require("react");
+const { connect } = require("react-redux");
 const { Link } = require("react-router");
 const { Navbar, Nav, NavItem } = require("react-bootstrap");
 const { LinkContainer } = require("react-router-bootstrap");
+const { node, object } = React.PropTypes;
 
 require("../../../css/index.css");
 const styles = require("./styles.css");
 
 const Main = React.createClass({
   propTypes: {
-    children: React.PropTypes.node
+    children: node,
+    user: object
   },
   render: function() {
+    const { user } = this.props;
     return (
       <div>
         <Navbar inverse collapseOnSelect className={styles.sharpEdged}>
@@ -21,14 +25,25 @@ const Main = React.createClass({
             <Navbar.Toggle/>
           </Navbar.Header>
           <Navbar.Collapse>
-            <Nav pullRight>
-              <LinkContainer to="/login">
-                <NavItem>Login</NavItem>
-              </LinkContainer>
-              <LinkContainer to="/register">
-                <NavItem>Register</NavItem>
-              </LinkContainer>
-            </Nav>
+            {
+              !user &&
+              <Nav pullRight>
+                <LinkContainer to="/login">
+                  <NavItem>Login</NavItem>
+                </LinkContainer>
+                <LinkContainer to="/register">
+                  <NavItem>Register</NavItem>
+                </LinkContainer>
+              </Nav>
+            }
+            {
+              user &&
+              <Nav pullRight>
+                <LinkContainer to="/user">
+                  <NavItem>{user.username}</NavItem>
+                </LinkContainer>
+              </Nav>
+            }
           </Navbar.Collapse>
         </Navbar>
         {this.props.children}
@@ -37,4 +52,12 @@ const Main = React.createClass({
   }
 });
 
-module.exports = Main;
+const mapStateToProps = function(state) {
+  return {
+    user: state.user
+  };
+};
+
+module.exports = connect(
+  mapStateToProps
+)(Main);

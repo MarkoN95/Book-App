@@ -1,20 +1,29 @@
 const React = require("react");
 const { connect } = require("react-redux");
 const { Grid, Row, Col, Form, FormGroup, FormControl, Button } = require("react-bootstrap");
+const { string, func, shape, bool, object } = React.PropTypes;
 
 const actions = require("../../actions/update");
+const thunks = require("../../actions/thunks");
 const styles = require("./styles.css");
 
 const Register = React.createClass({
   propTypes: {
-    updateInput: React.PropTypes.func.isRequired,
-    username: React.PropTypes.string.isRequired,
-    email: React.PropTypes.string.isRequired,
-    password: React.PropTypes.string.isRequired,
-    confirm_password: React.PropTypes.string.isRequired,
-    full_name: React.PropTypes.string.isRequired,
-    city: React.PropTypes.string.isRequired,
-    state: React.PropTypes.string.isRequired
+    updateInput: func.isRequired,
+    register: func.isRequired,
+    username: string.isRequired,
+    email: string.isRequired,
+    password: string.isRequired,
+    confirm_password: string.isRequired,
+    full_name: string.isRequired,
+    city: string.isRequired,
+    state: string.isRequired,
+    request: shape({
+      isPending: bool.isRequired,
+      success: bool,
+      error: object,
+      data: object
+    })
   },
   render: function() {
     var {
@@ -25,7 +34,8 @@ const Register = React.createClass({
       confirm_password,
       full_name,
       city,
-      state
+      state,
+      request
     } = this.props;
 
     return (
@@ -33,7 +43,7 @@ const Register = React.createClass({
         <Row>
           <Col md={4} sm={8} xs={10} mdOffset={4} smOffset={2} xsOffset={1}>
             <h3 className="text-center">Register</h3>
-            <Form>
+            <Form onSubmit={this.props.register}>
               <h4>Credentials</h4>
               <FormGroup>
                 <FormControl
@@ -103,9 +113,18 @@ const Register = React.createClass({
                 />
               </FormGroup>
 
-              <Button type="submit" className="btnInverse">
-                Register
+              <Button type="submit" className="btnInverse" disabled={request.isPending}>
+                {request.isPending ? "Loading..." : "Register"}
               </Button>
+
+              {
+                request.error &&
+                <FormGroup>
+                  <FormControl.Static>
+                    {request.error.message}
+                  </FormControl.Static>
+                </FormGroup>
+              }
             </Form>
           </Col>
         </Row>
@@ -122,14 +141,19 @@ const mapStateToProps = function(state) {
     confirm_password: state.register.confirm_password,
     full_name: state.register.full_name,
     city: state.register.city,
-    state: state.register.state
+    state: state.register.state,
+    request: state.registerRequest
   };
 };
 
-const mapDispatchToProps = function(dispatch) {
+const mapDispatchToProps = function(dispatch, ownProps) {
   return {
     updateInput: function(e) {
       dispatch(actions.updateFormInput("register", e.target.name, e.target.value));
+    },
+    register: function(e) {
+      e.preventDefault();
+      dispatch(thunks.register(ownProps));
     }
   };
 };

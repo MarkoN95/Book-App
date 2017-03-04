@@ -16,7 +16,7 @@ const render = (routes) => {
       <AppContainer>
         <Provider store={store}>
           <Router history={browserHistory}>
-            {routes()}
+            {routes(store)}
           </Router>
         </Provider>
       </AppContainer>,
@@ -27,7 +27,7 @@ const render = (routes) => {
     ReactDOM.render(
       <Provider store={store}>
         <Router history={browserHistory}>
-          {routes()}
+          {routes(store)}
         </Router>
       </Provider>,
       document.getElementById("app")

@@ -1,15 +1,16 @@
 const React = require("react");
 const { connect } = require("react-redux");
 const { Grid, Row, Col, Form, FormGroup, FormControl, ControlLabel, Button } = require("react-bootstrap");
+const { string, func } = React.PropTypes;
 
 const actions = require("../../actions/update");
 const styles = require("./styles.css");
 
 const Login = React.createClass({
   propTypes: {
-    updateInput: React.PropTypes.func.isRequired,
-    username: React.PropTypes.string.isRequired,
-    password: React.PropTypes.string.isRequired
+    updateInput: func.isRequired,
+    username: string.isRequired,
+    password: string.isRequired
   },
   render: function() {
     var {
