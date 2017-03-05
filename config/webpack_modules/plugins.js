@@ -47,3 +47,31 @@ exports.hashedModuleIds = function() {
     ]
   };
 };
+
+exports.addStackTrace = function() {
+  return {
+    plugins: [
+      new webpack.BannerPlugin({
+        banner: "require(\"source-map-support\").install();",
+        raw: true,
+        entryOnly: false
+      })
+    ]
+  };
+};
+
+exports.hmr = function() {
+  return {
+    plugins: [
+      new webpack.HotModuleReplacementPlugin()
+    ]
+  };
+};
+
+exports.namedModules = function() {
+  return {
+    plugins: [
+      new webpack.NamedModulesPlugin()
+    ]
+  };
+};

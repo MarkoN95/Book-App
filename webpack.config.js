@@ -1,6 +1,6 @@
 const path = require("path");
 const merge = require("webpack-merge");
-const { dev, loaders, plugins } = require("./config/parts");
+const { dev, loaders, plugins, utils } = require("./config/parts");
 
 const PATHS = {
   template: path.join(__dirname, "client", "index.pug"),
@@ -16,11 +16,6 @@ const common = merge(
       extensions: [".js", ".jsx"]
     }
   },
-  loaders.loadImages({
-    options: {
-      name: "images/[name].[contenthash].[ext]"
-    }
-  }),
   loaders.loadJS({ include: PATHS.app })
 );
 
@@ -36,6 +31,11 @@ const client = {
           filename: "[name].js"
         }
       },
+      loaders.loadImages({
+        options: {
+          name: "images/[name].[contenthash].[ext]"
+        }
+      }),
       loaders.loadPug({ include: PATHS.client }),
       plugins.HTMLPlugin({ template: PATHS.template }),
       dev.devServer({
@@ -64,8 +64,29 @@ const client = {
 
 const server = {
   development: function development() {
-    //server development config here
-    return;
+    return merge(
+      common,
+      {
+        entry: [
+          "webpack/hot/poll?1000",
+          PATHS.server
+        ],
+        output: {
+          path: path.join(PATHS.build, "server"),
+          filename: "backend.js"
+        },
+        target: "node",
+        node: {
+          __dirname: true,
+          __filename: true
+        }
+      },
+      utils.nodeModules(),
+      dev.sourceMap({ type: "source-map" }),
+      plugins.addStackTrace(),
+      plugins.hmr(),
+      plugins.namedModules()
+    );
   },
   production: function production() {
     //server production config here
@@ -77,10 +98,22 @@ module.exports = function(env) {
   if(env === "development") {
     process.env.BABEL_ENV = env;
 
-    return client.development();
+    switch(process.env.npm_lifecycle_event) {
+      case "start:client":
+        return client.development();
+
+      case "start:server":
+        return server.development();
+    }
   }
 
   if(env === "production") {
-    return client.production();
+    switch(process.env.npm_lifecycle_event) {
+      case "build:client":
+        return client.production();
+
+      case "build:server":
+        return server.production();
+    }
   }
 };
