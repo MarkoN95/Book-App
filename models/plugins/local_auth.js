@@ -68,7 +68,7 @@ const localAuthPlugin = function(schema, opt) {
   };
 
   schema.methods.validatePassword = function(passwordCmp, cb) {
-    pbkdf2(passwordCmp, (err, hashbuffer) => {
+    pbkdf2(passwordCmp, this.get(saltField), (err, hashbuffer) => {
       if(err) {
         return cb(err);
       }

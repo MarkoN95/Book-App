@@ -22,5 +22,6 @@ module.exports = {
     city: "",
     state: ""
   },
-  registerRequest: createRequest()
+  registerRequest: createRequest(),
+  user: null
 };
