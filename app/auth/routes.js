@@ -24,14 +24,13 @@ module.exports = function authRoutes(opt) {
   });
 
   router.post("/auth/local/login", passport.authenticate("local"), (req, res) => {
-    //TODO: normalize req.user before information is sent
-    res.json(req.user);
+    res.json(req.user.normalize("ownProfile"));
   });
 
   router.post("/auth/local/logout", ensureAuth, (req, res) => {
     req.logout();
     req.session.destroy();
-    res.json({ message: "successfully logged out" });
+    res.status(204).end();
   });
 
   router.post("/auth/local/register", (req, res) => {
@@ -44,7 +43,8 @@ module.exports = function authRoutes(opt) {
         full_name: req.body.full_name,
         city: req.body.city,
         state: req.body.state
-      }
+      },
+      login_method: "local"
     };
 
     User.register(new User(userinfo), req.body.password, (err, user) => {
@@ -52,8 +52,7 @@ module.exports = function authRoutes(opt) {
         return res.json(err);
       }
       passport.authenticate("local")(req, res, () => {
-        // TODO: normalize user before information is sent
-        res.json(user);
+        res.json(user.normalize("ownProfile"));
       });
     });
   });

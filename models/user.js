@@ -1,13 +1,15 @@
 require("./trade");
+require("./book");
 const mongoose = require("mongoose");
 const localAuthPlugin = require("./plugins/local_auth");
 const socialAuthPlugin = require("./plugins/social_auth");
+const normalizerPlugin = require("./plugins/normalizer");
 
 const User = mongoose.Schema({
   local: {
-    username: { type: String, unique: true, sparse: true },
-    email: { type: String, unique: true, sparse: true },
-    image_url: { type: String, default: "/images/dummy_image.png" },
+    username: { type: String, unique: true, sparse: true, trim: true },
+    email: { type: String, unique: true, sparse: true, trim: true },
+    image_url: { type: String, default: "/images/dummy_image.png", trim: true },
     hash: { type: String, select: false },
     salt: { type: String, select: false }
   },
@@ -23,17 +25,14 @@ const User = mongoose.Schema({
   },
   login_method: String,
   public: {
-    full_name: String,
-    city: String,
-    state: String
+    full_name: { type: String, trim: true },
+    city: { type: String, trim: true },
+    state: { type: String, trim: true }
   },
   library: [
     {
-      title: String,
-      author: String,
-      ISBN: String,
-      thumbnail_url: String,
-      available: Boolean
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "book"
     }
   ],
   trades: [
@@ -50,6 +49,51 @@ const User = mongoose.Schema({
   ]
 });
 
+const autoPopulateLibrary = function(next) {
+  this.populate({
+    path: "library",
+    select: "-owner"
+  });
+  next();
+};
+
+const autoPopulateLibraryAndTrades = function(next) {
+  this.populate([
+    {
+      path: "library",
+      select: "-owner"
+    },
+    {
+      path: "trades",
+      populate: [
+        {
+          path: "initiand",
+          select: "-library -trades"
+        },
+        {
+          path: "acceptand",
+          select: "-library -trades"
+        },
+        {
+          path: "initiand_stage",
+          select: "-owner"
+        },
+        {
+          path: "acceptand_stage",
+          select: "-owner"
+        }
+      ]
+    }
+  ]);
+  next();
+};
+
+// TODO: find a better method to hook up different pre middleware that differentiates between when
+// the trades are populated as well and when not (right now find vs finOne) but this doesn't feel right
+
+User.pre("find", autoPopulateLibrary);
+User.pre("findOne", autoPopulateLibraryAndTrades);
+
 User.plugin(localAuthPlugin, {
   usernameField: "local.username",
   hashField: "local.hash",
@@ -58,6 +102,10 @@ User.plugin(localAuthPlugin, {
 
 User.plugin(socialAuthPlugin, {
   methods: ["github", "twitter"]
+});
+
+User.plugin(normalizerPlugin, {
+  normalizers: require("./utils/normalizers").user
 });
 
 module.exports = mongoose.model("user", User);

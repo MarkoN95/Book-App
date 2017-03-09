@@ -6,7 +6,11 @@ const pbkdf2DigestSupport = semver.gte(process.version, "0.12.0");
 
 const errors = {
   existingUserError: function(msg) {
-    return new Error(msg || "this username is already taken");
+    return {
+      error: {
+        message: msg || "this username is already taken"
+      }
+    };
   },
   missingFieldsError: function(fields = [], msg) {
     return new TypeError(msg || "localAuthPlugin() fields: [" + fields.join(" ") + "] are missing in options");
@@ -138,7 +142,7 @@ const localAuthPlugin = function(schema, opt) {
     const self = this;
 
     return function(id, cb) {
-      const query = self.findById(id);
+      const query = self.findOne({ _id: id });
 
       if(populateFields) {
         query.populate(populateFields)
