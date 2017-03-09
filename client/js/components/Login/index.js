@@ -1,22 +1,31 @@
 const React = require("react");
 const { connect } = require("react-redux");
 const { Grid, Row, Col, Form, FormGroup, FormControl, ControlLabel, Button } = require("react-bootstrap");
-const { string, func } = React.PropTypes;
+const { string, func, shape, bool, object } = React.PropTypes;
 
 const actions = require("../../actions/update");
+const thunks = require("../../actions/thunks");
 const styles = require("./styles.css");
 
 const Login = React.createClass({
   propTypes: {
     updateInput: func.isRequired,
+    login: func.isRequired,
     username: string.isRequired,
-    password: string.isRequired
+    password: string.isRequired,
+    request: shape({
+      isPending: bool.isRequired,
+      success: bool,
+      error: object,
+      data: object
+    })
   },
   render: function() {
     var {
       username,
       password,
-      updateInput
+      updateInput,
+      request
     } = this.props;
 
     return (
@@ -24,7 +33,7 @@ const Login = React.createClass({
         <Row>
           <Col md={4} sm={8} xs={10} mdOffset={4} smOffset={2} xsOffset={1}>
             <h3 className="text-center">Native Login</h3>
-            <Form>
+            <Form onSubmit={this.props.login}>
               <FormGroup>
                 <ControlLabel>Username</ControlLabel>
                 <FormControl
@@ -43,9 +52,18 @@ const Login = React.createClass({
                   onChange={updateInput}
                 />
               </FormGroup>
-              <Button type="submit" className="btnInverse">
-                Login
+              <Button type="submit" className="btnInverse" disabled={request.isPending}>
+                {request.isPending ? "Loading..." : "Login"}
               </Button>
+
+              {
+                request.error &&
+                <FormGroup>
+                  <FormControl.Static>
+                    {request.error.message}
+                  </FormControl.Static>
+                </FormGroup>
+              }
             </Form>
             <div className={styles.socialLogin}>
               <h3 className={"text-center " + styles.socialLoginTitle}>Social Media Login</h3>
@@ -78,14 +96,19 @@ const Login = React.createClass({
 const mapStateToProps = function(state) {
   return {
     username: state.login.username,
-    password: state.login.password
+    password: state.login.password,
+    request: state.loginRequest
   };
 };
 
-const mapDispatchToProps = function(dispatch) {
+const mapDispatchToProps = function(dispatch, ownProps) {
   return {
     updateInput: function(e) {
       dispatch(actions.updateFormInput("login", e.target.name, e.target.value));
+    },
+    login: function(e) {
+      e.preventDefault();
+      dispatch(thunks.login(ownProps));
     }
   };
 };

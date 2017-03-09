@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { REGISTER_REQUEST } = require("./types");
+const { REGISTER_REQUEST, LOGIN_REQUEST } = require("./types");
 const { request, updateUser } = Object.assign({}, require("./request"), require("./user"));
 
 module.exports = {
@@ -15,6 +15,21 @@ module.exports = {
       })
       .catch((err) => {
         dispatch(request(REGISTER_REQUEST, "fail", err));
+      });
+    };
+  },
+  login: function(ownProps) {
+    return function(dispatch, getState) {
+      dispatch(request(LOGIN_REQUEST, "begin"));
+
+      axios.post("/auth/local/login", getState().login)
+      .then((res) => {
+        dispatch(request(LOGIN_REQUEST, "done"));
+        dispatch(updateUser(res.data));
+        ownProps.router.push("/user");
+      })
+      .catch((err) => {
+        dispatch(request(LOGIN_REQUEST, "fail", err));
       });
     };
   }
