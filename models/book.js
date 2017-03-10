@@ -7,9 +7,10 @@ const Book = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "user"
   },
+  book_id: String,
   title: { type: String, trim: true },
   author: { type: String, trim: true },
-  thumbnail_url: { type: String, default: "/media/dummy_book.png" },
+  thumbnail_url: { type: String, default: "/client/media/dummy_book.png" },
   available: Boolean,
   createdAt: Date
 });

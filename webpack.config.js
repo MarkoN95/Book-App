@@ -33,7 +33,7 @@ const client = {
       },
       loaders.loadImages({
         options: {
-          name: "images/[name].[contenthash].[ext]"
+          name: "images/[name].[ext]"
         }
       }),
       loaders.loadPug({ include: PATHS.client }),

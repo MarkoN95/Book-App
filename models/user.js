@@ -9,19 +9,19 @@ const User = mongoose.Schema({
   local: {
     username: { type: String, unique: true, sparse: true, trim: true },
     email: { type: String, unique: true, sparse: true, trim: true },
-    image_url: { type: String, default: "/images/dummy_image.png", trim: true },
+    image_url: { type: String, default: "/client/media/dummy_image.png", trim: true },
     hash: { type: String, select: false },
     salt: { type: String, select: false }
   },
   github: {
     id: String,
     username: String,
-    image_url: { type: String, default: "/images/dummy_image.png" }
+    image_url: { type: String, default: "/client/media/dummy_image.png" }
   },
   twitter: {
     id: String,
     username: String,
-    image_url: { type: String, default: "/images/dummy_image.png" }
+    image_url: { type: String, default: "/client/media/dummy_image.png" }
   },
   login_method: String,
   public: {
