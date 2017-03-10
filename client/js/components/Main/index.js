@@ -1,7 +1,7 @@
 const React = require("react");
 const { connect } = require("react-redux");
 const { Link } = require("react-router");
-const { Navbar, Nav, NavItem, Glyphicon } = require("react-bootstrap");
+const { Navbar, Nav, NavItem, NavDropdown, MenuItem, Glyphicon, Button } = require("react-bootstrap");
 const { LinkContainer } = require("react-router-bootstrap");
 const { node, object } = React.PropTypes;
 
@@ -42,9 +42,19 @@ const Main = React.createClass({
                 <LinkContainer to="/user">
                   <NavItem>{user.username}</NavItem>
                 </LinkContainer>
-                <LinkContainer to="/user/settings">
-                  <NavItem><Glyphicon glyph="cog"></Glyphicon></NavItem>
-                </LinkContainer>
+                <NavDropdown>
+                  <li role="presentation">
+                    <Link to="/user/settings">
+                      <Glyphicon glyph="cog"/> Settings
+                    </Link>
+                  </li>
+                  <MenuItem divider/>
+                  <li role="presentation">
+                    <a href="#" onClick={() => { /*dispatch logout here*/ }}>
+                      <Glyphicon glyph="log-out"/> Logout
+                    </a>
+                  </li>
+                </NavDropdown>
               </Nav>
             }
           </Navbar.Collapse>

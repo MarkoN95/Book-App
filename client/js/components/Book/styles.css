@@ -8,3 +8,10 @@
   max-height: 280px;
   max-width: 190px;
 }
+
+@media(max-width: 979px) {
+  .cover {
+    max-height: 190px;
+    max-width: 100px;
+  }
+}
