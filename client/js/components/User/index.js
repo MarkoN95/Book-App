@@ -13,7 +13,12 @@ const User = React.createClass({
   testBooks: function(max) {
     let books = [];
     for(var i = 0; i < max; i++) {
-      books.push(<Book url="/client/media/dummy_book.png"/>);
+      var data = {
+        title: "Harry Potter",
+        author: "J. K. Rowling",
+        url: "/client/media/dummy_book.png"
+      };
+      books.push(<Book type="trade" data={data} action={() => { /*here starts the fun*/ }}/>);
     }
     return books;
   },
