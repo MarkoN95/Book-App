@@ -3,8 +3,8 @@ module.exports = {
     return {
       type,
       cmd,
-      error,
-      data
+      error: error,
+      data: data
     };
   }
 };

@@ -23,5 +23,6 @@ module.exports = {
     state: ""
   },
   registerRequest: createRequest(),
-  user: null
+  user: null,
+  logoutRequest: createRequest()
 };

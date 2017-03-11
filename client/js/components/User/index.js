@@ -18,7 +18,7 @@ const User = React.createClass({
         author: "J. K. Rowling",
         url: "/client/media/dummy_book.png"
       };
-      books.push(<Book type="trade" data={data} action={() => { /*here starts the fun*/ }}/>);
+      books.push(<Book key={Date.now() + i} type="trade" data={data} action={() => { /*here starts the fun*/ }}/>);
     }
     return books;
   },
@@ -53,7 +53,7 @@ const User = React.createClass({
           </Col>
           <Col md={8} sm={8} xs={12}>
             <div className={styles.tabsContainer}>
-              <Tabs>
+              <Tabs id="user-tabs">
                 <Tab eventKey={1} title="Library">
                   {this.testBooks(10)}
                 </Tab>

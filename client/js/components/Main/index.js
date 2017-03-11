@@ -1,9 +1,11 @@
 const React = require("react");
 const { connect } = require("react-redux");
 const { Link } = require("react-router");
-const { Navbar, Nav, NavItem, NavDropdown, MenuItem, Glyphicon, Button } = require("react-bootstrap");
+const { Navbar, Nav, NavItem, NavDropdown, MenuItem, Glyphicon } = require("react-bootstrap");
 const { LinkContainer } = require("react-router-bootstrap");
-const { node, object } = React.PropTypes;
+const { node, object, shape, bool, func } = React.PropTypes;
+
+const thunks = require("../../actions/thunks");
 
 require("../../../css/index.css");
 const styles = require("./styles.css");
@@ -11,10 +13,17 @@ const styles = require("./styles.css");
 const Main = React.createClass({
   propTypes: {
     children: node,
-    user: object
+    user: object,
+    logout: func.isRequired,
+    request: shape({
+      isPending: bool.isRequired,
+      success: bool,
+      error: object,
+      data: object
+    })
   },
   render: function() {
-    const { user } = this.props;
+    const { user, request, logout } = this.props;
     return (
       <div>
         <Navbar inverse collapseOnSelect className={styles.sharpEdged}>
@@ -42,7 +51,7 @@ const Main = React.createClass({
                 <LinkContainer to="/user">
                   <NavItem>{user.username}</NavItem>
                 </LinkContainer>
-                <NavDropdown>
+                <NavDropdown title="" id="nav-dropdown">
                   <li role="presentation">
                     <Link to="/user/settings">
                       <Glyphicon glyph="cog"/> Settings
@@ -50,8 +59,12 @@ const Main = React.createClass({
                   </li>
                   <MenuItem divider/>
                   <li role="presentation">
-                    <a href="#" onClick={() => { /*dispatch logout here*/ }}>
-                      <Glyphicon glyph="log-out"/> Logout
+                    <a href="#" onClick={logout}>
+                      <Glyphicon glyph="log-out"/>
+                      {
+                        request.isPending ? "Loading..." :
+                        request.error ? <span className="error-msg">logout failed</span> : "Logout"
+                      }
                     </a>
                   </li>
                 </NavDropdown>
@@ -67,10 +80,20 @@ const Main = React.createClass({
 
 const mapStateToProps = function(state) {
   return {
-    user: state.user
+    user: state.user,
+    request: state.logoutRequest
+  };
+};
+
+const mapDispatchToProps = function(dispatch, ownProps) {
+  return {
+    logout: function() {
+      dispatch(thunks.logout(ownProps));
+    }
   };
 };
 
 module.exports = connect(
-  mapStateToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(Main);

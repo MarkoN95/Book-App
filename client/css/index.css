@@ -22,3 +22,7 @@
 :global .form-control-static {
   color: #ff0000;
 }
+
+:global .error-msg {
+  color: #ff0000;
+}

@@ -15,9 +15,9 @@ const Book = React.createClass({
       mouseOver: false
     };
   },
-  toggle: function() {
+  toggle: function(bool) {
     this.setState({
-      mouseOver: !this.state.mouseOver
+      mouseOver: bool
     });
   },
   render: function() {
@@ -26,7 +26,7 @@ const Book = React.createClass({
     let { cover, coverInfo, show, blur } = styles;
     return(
       <div className={styles.book}>
-        <div onMouseEnter={this.toggle} onMouseLeave={this.toggle}>
+        <div onMouseEnter={this.toggle.bind(this, true)} onMouseLeave={this.toggle.bind(this, false)}>
           <Image
             src={this.props.data.url}
             className={mouseOver ? cover + " " + blur : cover}

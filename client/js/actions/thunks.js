@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { REGISTER_REQUEST, LOGIN_REQUEST } = require("./types");
+const { REGISTER_REQUEST, LOGIN_REQUEST, LOGOUT_REQUEST } = require("./types");
 const { request, updateUser } = Object.assign({}, require("./request"), require("./user"));
 
 /*
@@ -11,10 +11,11 @@ const { request, updateUser } = Object.assign({}, require("./request"), require(
  * body: optional request body
  * onSuccess: this handler is wrapped in a dispatch call and should return a redux action the response is passed as it's argument
  * final: use this function for any side effects (onyl called if request succeeds).
+ * finalFirst: boolean used to call the final callback before the onSuccess handler
  *
  */
 
-function makeAjaxRequest({ dispatch, type, verb, url, body, onSuccess, final }) {
+function ajaxRequest({ dispatch, type, verb, url, body, onSuccess, final, finalFirst }) {
   if(["get", "post", "put", "delete"].indexOf(verb) === -1) {
     throw new Error("invalid request verb: " + verb);
   }
@@ -26,8 +27,9 @@ function makeAjaxRequest({ dispatch, type, verb, url, body, onSuccess, final }) 
   axios[verb](url, body)
   .then((res) => {
     dispatch(request(type, "done"));
+    finalFirst && typeof final === "function" && final();
     dispatch(onSuccess(res.data));
-    typeof final === "function" && final();
+    !finalFirst && typeof final === "function" && final();
   })
   .catch((err) => {
     dispatch(request(type, "fail", err));
@@ -37,7 +39,7 @@ function makeAjaxRequest({ dispatch, type, verb, url, body, onSuccess, final }) 
 module.exports = {
   register: function(ownProps) {
     return function(dispatch, getState) {
-      makeAjaxRequest({
+      ajaxRequest({
         dispatch,
         type: REGISTER_REQUEST,
         verb: "post",
@@ -52,7 +54,7 @@ module.exports = {
   },
   login: function(ownProps) {
     return function(dispatch, getState) {
-      makeAjaxRequest({
+      ajaxRequest({
         dispatch,
         type: LOGIN_REQUEST,
         verb: "post",
@@ -61,6 +63,25 @@ module.exports = {
         onSuccess: updateUser,
         final: function() {
           ownProps.router.push("/user");
+        }
+      });
+    };
+  },
+  logout: function(ownProps) {
+    return function(dispatch) {
+      ajaxRequest({
+        dispatch,
+        type: LOGOUT_REQUEST,
+        verb: "post",
+        url: "/auth/local/logout",
+        finalFirst: true,
+        onSuccess: function() {
+          // this wrap is necessary because axios interprets 204 responses as an empty string
+          // even though tecnically 204's contain no response text
+          return updateUser(null);
+        },
+        final: function() {
+          ownProps.router.push("/login");
         }
       });
     };
