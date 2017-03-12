@@ -20,27 +20,42 @@ const Book = React.createClass({
       mouseOver: bool
     });
   },
+  format: function(str) {
+    return str.length > 25 ? str.substr(0, 20) + "..." : str;
+  },
+  formatBook: function(book) {
+    let v = book.volumeInfo;
+    return {
+      id: book.id,
+      title: v.title || "",
+      author: v.authors ? v.authors[0] : "",
+      thumbnail_url: v.imageLinks ? v.imageLinks.thumbnail : "client/media/dummy_book.png"
+    };
+  },
   render: function() {
-    let { title, author } = this.props.data;
+    let { type, data } = this.props;
     let { mouseOver } = this.state;
     let { cover, coverInfo, show, blur } = styles;
+
+    //format only necessary when they come raw from the api and not from the own server
+    let book = type === "add" ? this.formatBook(data) : data;
     return(
       <div className={styles.book}>
         <div onMouseEnter={this.toggle.bind(this, true)} onMouseLeave={this.toggle.bind(this, false)}>
           <Image
-            src={this.props.data.url}
+            src={book.thumbnail_url}
             className={mouseOver ? cover + " " + blur : cover}
             responsive
           />
           <div className={mouseOver ? coverInfo + " " + show : coverInfo}>
             <span><b>Title:</b></span>
-            <p>{title}</p>
+            <p>{this.format(book.title)}</p>
 
             <span><b>Author:</b></span>
-            <p>{author}</p>
+            <p>{this.format(book.author)}</p>
           </div>
         </div>
-        <Button className="btnInverse edge"  onClick={this.props.action} block>
+        <Button className="btnInverse edge"  onClick={this.props.action.bind(this, book)} block>
           {this.props.type}
         </Button>
       </div>

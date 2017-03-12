@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { REGISTER_REQUEST, LOGIN_REQUEST, LOGOUT_REQUEST } = require("./types");
+const { REGISTER_REQUEST, LOGIN_REQUEST, LOGOUT_REQUEST, BOOK_SEARCH_REQUEST } = require("./types");
 const { request, updateUser } = Object.assign({}, require("./request"), require("./user"));
 
 /*
@@ -15,20 +15,17 @@ const { request, updateUser } = Object.assign({}, require("./request"), require(
  *
  */
 
-function ajaxRequest({ dispatch, type, verb, url, body, onSuccess, final, finalFirst }) {
+function ajaxRequest({ dispatch, type, verb, url, body, onSuccess, final, finalFirst, passData }) {
   if(["get", "post", "put", "delete"].indexOf(verb) === -1) {
     throw new Error("invalid request verb: " + verb);
-  }
-  if(typeof onSuccess !== "function") {
-    throw new TypeError("onSuccess is not a function");
   }
 
   dispatch(request(type, "begin"));
   axios[verb](url, body)
   .then((res) => {
-    dispatch(request(type, "done"));
+    dispatch(request(type, "done", null, passData ? res.data : null));
     finalFirst && typeof final === "function" && final();
-    dispatch(onSuccess(res.data));
+    typeof onSuccess === "function" && onSuccess(res);
     !finalFirst && typeof final === "function" && final();
   })
   .catch((err) => {
@@ -45,7 +42,9 @@ module.exports = {
         verb: "post",
         url: "/auth/local/register",
         body: getState().register,
-        onSuccess: updateUser,
+        onSuccess: function(res) {
+          dispatch(updateUser(res.data));
+        },
         final: function() {
           ownProps.router.push("/user");
         }
@@ -60,7 +59,9 @@ module.exports = {
         verb: "post",
         url: "/auth/local/login",
         body: getState().login,
-        onSuccess: updateUser,
+        onSuccess: function(res) {
+          dispatch(updateUser(res.data));
+        },
         final: function() {
           ownProps.router.push("/user");
         }
@@ -76,13 +77,22 @@ module.exports = {
         url: "/auth/local/logout",
         finalFirst: true,
         onSuccess: function() {
-          // this wrap is necessary because axios interprets 204 responses as an empty string
-          // even though tecnically 204's contain no response text
-          return updateUser(null);
+          dispatch(updateUser(null));
         },
         final: function() {
           ownProps.router.push("/login");
         }
+      });
+    };
+  },
+  searchBooks: function() {
+    return function(dispatch, getState) {
+      ajaxRequest({
+        dispatch,
+        type: BOOK_SEARCH_REQUEST,
+        verb: "get",
+        url: "/api/books/search" + "?q=" + getState().bookSearch.query,
+        passData: true
       });
     };
   }

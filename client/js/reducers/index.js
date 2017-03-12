@@ -1,14 +1,23 @@
 const composeReducers = require("./compose");
 const createRequestReducer = require("./request");
+const createFormReducer = require("./form");
 
-const { LOGIN_REQUEST, REGISTER_REQUEST, LOGOUT_REQUEST } = require("../actions/types");
+const {
+  LOGIN_REQUEST,
+  REGISTER_REQUEST,
+  LOGOUT_REQUEST,
+  BOOK_SEARCH_REQUEST
+} = require("../actions/types");
 
-const login = require("./login");
-const register = require("./register");
-const loginRequest = createRequestReducer(LOGIN_REQUEST);
-const registerRequest = createRequestReducer(REGISTER_REQUEST);
-const logoutRequest = createRequestReducer(LOGOUT_REQUEST);
-const user = require("./user");
+const login             = createFormReducer("login");
+const loginRequest      = createRequestReducer(LOGIN_REQUEST);
+const register          = createFormReducer("register");
+const registerRequest   = createRequestReducer(REGISTER_REQUEST);
+const user              = require("./user");
+const logoutRequest     = createRequestReducer(LOGOUT_REQUEST);
+const bookSearch        = createFormReducer("bookSearch");
+const bookSearchRequest = createRequestReducer(BOOK_SEARCH_REQUEST);
+
 
 module.exports = composeReducers({
   login,
@@ -16,5 +25,7 @@ module.exports = composeReducers({
   register,
   registerRequest,
   user,
-  logoutRequest
+  logoutRequest,
+  bookSearch,
+  bookSearchRequest
 });

@@ -13,6 +13,7 @@
 .coverInfo {
   opacity: 0;
   position: absolute;
+  max-height: 280px;
   top: 0;
   left: 0;
   padding-left: 8px;
@@ -31,5 +32,9 @@
   .cover {
     max-height: 190px;
     max-width: 100px;
+  }
+
+  .coverInfo {
+    max-height: 190px;
   }
 }

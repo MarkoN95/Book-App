@@ -24,7 +24,7 @@ router.get("/api/books/search", (req, res) => {
     googleBooks(req.query).pipe(res);
   }
   else {
-    res.json(errors.invalidQueryError());
+    res.status(400).json(errors.invalidQueryError());
   }
 });
 

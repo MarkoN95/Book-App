@@ -24,5 +24,9 @@ module.exports = {
   },
   registerRequest: createRequest(),
   user: null,
-  logoutRequest: createRequest()
+  logoutRequest: createRequest(),
+  bookSearch: {
+    query: ""
+  },
+  bookSearchRequest: createRequest()
 };

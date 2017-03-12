@@ -1,29 +1,31 @@
 const React = require("react");
 const { connect } = require("react-redux");
-const { Grid, Row, Col, Image, Tabs, Tab } = require("react-bootstrap");
-const { object } = React.PropTypes;
+const { Grid, Row, Col, Image, Tabs, Tab, Form, FormGroup, InputGroup, FormControl, Button, Glyphicon } = require("react-bootstrap");
+const { object, string, shape, bool, func } = React.PropTypes;
+
+const thunks = require("../../actions/thunks");
+const actions = require("../../actions/update");
 
 const styles = require("./styles.css");
 const Book = require("../Book");
 
 const User = React.createClass({
   propTypes: {
-    user: object
-  },
-  testBooks: function(max) {
-    let books = [];
-    for(var i = 0; i < max; i++) {
-      var data = {
-        title: "Harry Potter",
-        author: "J. K. Rowling",
-        url: "/client/media/dummy_book.png"
-      };
-      books.push(<Book key={Date.now() + i} type="trade" data={data} action={() => { /*here starts the fun*/ }}/>);
-    }
-    return books;
+    user: object,
+    search: string.isRequired,
+    update: func.isRequired,
+    submitSearch: func.isRequired,
+    addBook: func.isRequired,
+    request: shape({
+      isPending: bool.isRequired,
+      success: bool,
+      error: object,
+      data: object
+    })
   },
   render: function() {
-    let { user } = this.props;
+    let { user, request, submitSearch, search, update, addBook } = this.props;
+
     return(
       <Grid className="mainGrid" fluid>
         <Row className={styles.profileRow}>
@@ -55,13 +57,55 @@ const User = React.createClass({
             <div className={styles.tabsContainer}>
               <Tabs id="user-tabs">
                 <Tab eventKey={1} title="Library">
-                  {this.testBooks(10)}
+                  Library here
                 </Tab>
                 <Tab eventKey={2} title="Trades">
                   Active Trades here
                 </Tab>
                 <Tab eventKey={3} title="Add a Book">
-                  Book search here
+                  <Row>
+                    <Col xs={8} xsOffset={2} className={styles.bookSearch}>
+                      <Form onSubmit={submitSearch}>
+                        <FormGroup>
+                          <InputGroup>
+                            <FormControl
+                              name="query"
+                              type="text"
+                              placeholder="book title"
+                              value={search}
+                              onChange={update}
+                            />
+                            <InputGroup.Button>
+                              <Button type="submit" className="btnInverse">
+                                {
+                                  request.isPending ? <i className="fa fa-spinner fa-spin"></i> :
+                                  <Glyphicon glyph="search"/>
+                                }
+                              </Button>
+                            </InputGroup.Button>
+                          </InputGroup>
+                        </FormGroup>
+                      </Form>
+                    </Col>
+                  </Row>
+                <hr/>
+                <Row>
+                  <Col xs={12}>
+                    {
+                      request.success &&
+                      request.data.items &&
+                      request.data.items.map((book) => {
+                        return(<Book key={book.id} data={book} type="add" action={addBook}/>);
+                      })
+                    }
+                    {
+                      request.error &&
+                      <span className="error-msg">
+                        {request.error.message}
+                      </span>
+                    }
+                  </Col>
+                </Row>
                 </Tab>
               </Tabs>
             </div>
@@ -74,10 +118,28 @@ const User = React.createClass({
 
 const mapStateToProps = function(state) {
   return {
-    user: state.user
+    user: state.user,
+    search: state.bookSearch.query,
+    request: state.bookSearchRequest
+  };
+};
+
+const mapDispatchToProps = function(dispatch) {
+  return {
+    update: function(e) {
+      dispatch(actions.updateFormInput("bookSearch", e.target.name, e.target.value));
+    },
+    submitSearch: function(e) {
+      e.preventDefault();
+      dispatch(thunks.searchBooks());
+    },
+    addBook: function(book) {
+      console.log(book);
+    }
   };
 };
 
 module.exports = connect(
-  mapStateToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(User);
