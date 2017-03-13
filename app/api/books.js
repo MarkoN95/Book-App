@@ -45,7 +45,7 @@ router.post("/api/books/add", ensureAuth, (req, res) => {
     if(err) {
       return res.status(500).send(err);
     }
-    req.user.addBook(book, (err) => {
+    User.addBook(req.user._id, book, (err) => {
       if(err) {
         return res.status(500).send(err);
       }

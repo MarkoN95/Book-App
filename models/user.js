@@ -4,6 +4,9 @@ const mongoose = require("mongoose");
 const localAuthPlugin = require("./plugins/local_auth");
 const socialAuthPlugin = require("./plugins/social_auth");
 const normalizerPlugin = require("./plugins/normalizer");
+const checker = require("./utils/checker");
+
+const errors = require("./utils/errors");
 
 const User = mongoose.Schema({
   local: {
@@ -57,6 +60,24 @@ User.methods.addBook = function(book, cb) {
     }
     cb();
   });
+};
+
+User.statics.addBook = function(userId, book, cb) {
+  if(!checker.objectId(userId)) {
+    return cb(errors.invalidObjectIdError("we couldn't add your book. please log out and in and try again"));
+  }
+
+  this.findOneAndUpdate(
+    { _id: userId },
+    { $push: { library: book } },
+    { new: true },
+    (err) => {
+      if(err) {
+        return cb(err);
+      }
+      cb(null, true);
+    }
+  );
 };
 
 const autoPopulateLibrary = function(next) {

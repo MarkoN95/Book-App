@@ -3,15 +3,7 @@ const mongoose = require("mongoose");
 const normalizerPlugin = require("./plugins/normalizer");
 const checker = require("./utils/checker");
 
-const errors = {
-  invalidOwnerError: function(msg) {
-    return {
-      error: {
-        message: msg || "the owner of the book you want to add couldn't be found"
-      }
-    };
-  }
-};
+const errors = require("./utils/errors");
 
 const Book = mongoose.Schema({
   owner: {
@@ -40,7 +32,7 @@ Book.statics.addBook = function(owner, book, cb) {
   }
 
   if(!checker.objectId(owner)) {
-    return cb(errors.invalidOwnerError());
+    return cb(errors.invalidOwnerError("we couldn't add your book. please log out and in and try again"));
   }
 
   book.set("owner", owner);

@@ -28,40 +28,44 @@ function normalizePublic(user) {
   };
 }
 
-function normalizeLibrary(user) {
+function normalizeOwnLibrary(user) {
   return {
-    library: user.library
+    library: user.library.map(book_normalizers.ownLibrary)
   };
 }
 
-module.exports = {
-  user: {
-    ownProfile: function(user) {
-      return Object.assign({},
-         normalizePublic(user),
-         normalizeLibrary(user),
-         normalizeTrades(user)
-       );
-    },
-    profile: function(user) {
-      return normalizePublic(user);
-    }
+const user_normalizers = {
+  ownProfile: function(user) {
+    return Object.assign({},
+       normalizePublic(user),
+       normalizeOwnLibrary(user),
+       normalizeTrades(user)
+     );
   },
-  book: {
-    "default": function(book) {
-      return Object.assign({}, book, {
-        owner: normalizePublic(book.owner)
-      });
-    },
-    ownLibrary: function(book) {
-      return {
-        id: book._id,
-        title: book.title,
-        author: book.author,
-        thumbnail_url: book.thumbnail_url,
-        available: book.available,
-        createdAt: book.createdAt
-      };
-    }
+  profile: function(user) {
+    return normalizePublic(user);
   }
+};
+
+const book_normalizers = {
+  "default": function(book) {
+    return Object.assign({}, book, {
+      owner: normalizePublic(book.owner)
+    });
+  },
+  ownLibrary: function(book) {
+    return {
+      id: book._id,
+      title: book.title,
+      author: book.author,
+      thumbnail_url: book.thumbnail_url,
+      available: book.available,
+      createdAt: book.createdAt
+    };
+  }
+};
+
+module.exports = {
+  user: user_normalizers,
+  book: book_normalizers
 };
