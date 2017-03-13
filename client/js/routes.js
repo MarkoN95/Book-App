@@ -6,6 +6,7 @@ const Home = require("./components/Home");
 const Login = require("./components/Login");
 const Register = require("./components/Register");
 const User = require("./components/User");
+const Settings = require("./components/Settings");
 
 const routes = function(store) {
 
@@ -21,6 +22,7 @@ const routes = function(store) {
       <Route path="/login" component={Login}/>
       <Route path="/register" component={Register}/>
       <Route path="/user" component={User} onEnter={requireAuth}/>
+      <Route path="/user/settings" component={Settings} onEnter={requireAuth}/>
     </Route>
   );
 };
