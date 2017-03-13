@@ -30,10 +30,11 @@ router.get("/api/books/search", (req, res) => {
 });
 
 router.get("/api/books/find", (req, res) => {
-
+  //find books from the marketplace here
 });
 
 router.post("/api/books/add", ensureAuth, (req, res) => {
+
   const info = {
     book_id: req.body.id,
     title: req.body.title,
@@ -55,7 +56,18 @@ router.post("/api/books/add", ensureAuth, (req, res) => {
 });
 
 router.delete("/api/books/remove", ensureAuth, (req, res) => {
-
+  
+  Book.removeBook(req.user._id, req.query.id, (err) => {
+    if(err) {
+      return res.status(500).send(err);
+    }
+    User.removeBook(req.user._id, req.query.id, (err) => {
+      if(err) {
+        return res.status(500).send(err);
+      }
+      res.status(204).end();
+    });
+  });
 });
 
 module.exports = function() {

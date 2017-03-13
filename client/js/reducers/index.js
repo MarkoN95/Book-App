@@ -8,7 +8,9 @@ const {
   LOGOUT_REQUEST,
   BOOK_SEARCH_REQUEST,
   BOOK_ADD_REQUEST,
-  ADD_BOOK
+  ADD_BOOK,
+  BOOK_REMOVE_REQUEST,
+  REMOVE_BOOK
 } = require("../actions/types");
 
 const login             = createFormReducer("login");
@@ -33,6 +35,19 @@ const addBook = composeReducers({
   request: createRequestReducer(BOOK_ADD_REQUEST)
 });
 
+const removeBook = composeReducers({
+  id: function(state, action) {
+    switch(action.type) {
+      case REMOVE_BOOK:
+        return action.id;
+
+      default:
+        return state;
+    }
+  },
+  request: createRequestReducer(BOOK_REMOVE_REQUEST)
+});
+
 
 module.exports = composeReducers({
   login,
@@ -43,5 +58,6 @@ module.exports = composeReducers({
   logoutRequest,
   bookSearch,
   bookSearchRequest,
-  addBook
+  addBook,
+  removeBook
 });

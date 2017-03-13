@@ -32,5 +32,9 @@ module.exports = {
   addBook: {
     id: null,
     request: createRequest()
+  },
+  removeBook: {
+    id: null,
+    request: createRequest()
   }
 };

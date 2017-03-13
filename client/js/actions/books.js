@@ -1,9 +1,7 @@
-const types = require("./types");
-
 module.exports = {
-  selectBookId: function(id) {
+  selectBookId: function(type, id) {
     return {
-      type: types.ADD_BOOK,
+      type,
       id
     };
   }

@@ -3,6 +3,7 @@ const { connect } = require("react-redux");
 const { Grid, Row, Col, Image, Tabs, Tab, Form, FormGroup, InputGroup, FormControl, Button, Glyphicon } = require("react-bootstrap");
 const { object, string, shape, bool, func } = React.PropTypes;
 
+const types = require("../../actions/types");
 const thunks = require("../../actions/thunks");
 const actions = Object.assign({}, require("../../actions/update"), require("../../actions/books"));
 
@@ -31,10 +32,19 @@ const User = React.createClass({
         error: object,
         data: object
       })
+    }),
+    bookRemove: shape({
+      id: string,
+      request: shape({
+        isPending: bool.isRequired,
+        success: bool,
+        error: object,
+        data: object
+      })
     })
   },
   render: function() {
-    let { user, bookSearch, bookAdd, submitSearch, search, update, addBook, removeBook } = this.props;
+    let { user, bookSearch, bookAdd, bookRemove, submitSearch, search, update, addBook, removeBook } = this.props;
 
     return(
       <Grid className="mainGrid" fluid>
@@ -68,6 +78,12 @@ const User = React.createClass({
               <Tabs id="user-tabs">
                 <Tab eventKey={1} title="Library">
                   {
+                    bookRemove.request.error &&
+                    <p className="err-msg">
+                      {bookRemove.request.error.message}
+                    </p>
+                  }
+                  {
                     user.library.length === 0 &&
                     <p className={"text-center " + styles.noBooks}>
                       Your library is empty. You can add books from the
@@ -78,7 +94,12 @@ const User = React.createClass({
                     user.library.length !== 0 &&
                     user.library.map((book) => {
                       return(
-                        <Book key={book.id} data={book} type="remove" action={removeBook}/>
+                        <Book
+                          pending={bookRemove.request.isPending && book.id === bookRemove.id}
+                          key={book.id}
+                          data={book}
+                          type="remove"
+                          action={removeBook}/>
                       );
                     })
                   }
@@ -158,7 +179,8 @@ const mapStateToProps = function(state) {
     user: state.user,
     search: state.bookSearch.query,
     bookSearch: state.bookSearchRequest,
-    bookAdd: state.addBook
+    bookAdd: state.addBook,
+    bookRemove: state.removeBook
   };
 };
 
@@ -172,11 +194,12 @@ const mapDispatchToProps = function(dispatch) {
       dispatch(thunks.searchBooks());
     },
     addBook: function(book) {
-      dispatch(actions.selectBookId(book.id));
+      dispatch(actions.selectBookId(types.ADD_BOOK, book.id));
       dispatch(thunks.addBook(book));
     },
     removeBook: function(book) {
-      console.log(book);
+      dispatch(actions.selectBookId(types.REMOVE_BOOK, book.id));
+      dispatch(thunks.removeBook(book));
     }
   };
 };

@@ -52,30 +52,36 @@ const User = mongoose.Schema({
   ]
 });
 
-User.methods.addBook = function(book, cb) {
-  this.library.push(book);
-  this.save((err) => {
-    if(err) {
-      return cb(err);
-    }
-    cb();
-  });
-};
-
 User.statics.addBook = function(userId, book, cb) {
   if(!checker.objectId(userId)) {
-    return cb(errors.invalidObjectIdError("we couldn't add your book. please log out and in and try again"));
+    return cb(errors.invalidObjectIdError("we couldn't add your book. please try again"));
   }
 
   this.findOneAndUpdate(
     { _id: userId },
     { $push: { library: book } },
-    { new: true },
     (err) => {
       if(err) {
         return cb(err);
       }
-      cb(null, true);
+      cb();
+    }
+  );
+};
+
+User.statics.removeBook = function(userId, bookId, cb) {
+  if(!checker.objectId(userId)) {
+    return cb(errors.invalidObjectIdError("we couldn't remove your book. please try again"));
+  }
+
+  this.findOneAndUpdate(
+    { _id: userId },
+    { $pull: { library: bookId } },
+    (err) => {
+      if(err) {
+        return cb(err);
+      }
+      cb();
     }
   );
 };

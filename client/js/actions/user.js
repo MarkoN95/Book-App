@@ -12,5 +12,11 @@ module.exports = {
       type: types.ADD_TO_LIBRARY,
       book
     };
+  },
+  removeFromLibrary: function(id) {
+    return {
+      type: types.REMOVE_FROM_LIBRARY,
+      id
+    };
   }
 };

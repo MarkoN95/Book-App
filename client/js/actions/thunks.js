@@ -1,11 +1,12 @@
 const axios = require("axios");
-const { request, updateUser, addToLibrary } = Object.assign({}, require("./request"), require("./user"));
+const { request, updateUser, addToLibrary, removeFromLibrary } = Object.assign({}, require("./request"), require("./user"));
 const {
   REGISTER_REQUEST,
   LOGIN_REQUEST,
   LOGOUT_REQUEST,
   BOOK_SEARCH_REQUEST,
-  BOOK_ADD_REQUEST
+  BOOK_ADD_REQUEST,
+  BOOK_REMOVE_REQUEST
 } = require("./types");
 
 /*
@@ -127,6 +128,25 @@ module.exports = {
         body: book,
         onSuccess: function(res) {
           dispatch(addToLibrary(res.data));
+        }
+      });
+    };
+  },
+  removeBook: function(book) {
+    return function(dispatch) {
+
+      if(!book) {
+        let err = new Error("book id not found in library");
+        return dispatch(request(BOOK_REMOVE_REQUEST, "fail", err));
+      }
+
+      ajaxRequest({
+        dispatch,
+        type: BOOK_REMOVE_REQUEST,
+        verb: "delete",
+        url: "/api/books/remove?id=" + book.id,
+        onSuccess: function() {
+          dispatch(removeFromLibrary(book.id));
         }
       });
     };

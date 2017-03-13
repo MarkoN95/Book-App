@@ -10,6 +10,11 @@ const user = function(state, action) {
         library: state.library.concat([action.book])
       });
 
+    case types.REMOVE_FROM_LIBRARY:
+      return Object.assign({}, state, {
+        library: state.library.filter(book => book.id !== action.id)
+      });
+
     default:
       return state;
   }

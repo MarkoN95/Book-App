@@ -32,7 +32,7 @@ Book.statics.addBook = function(owner, book, cb) {
   }
 
   if(!checker.objectId(owner)) {
-    return cb(errors.invalidOwnerError("we couldn't add your book. please log out and in and try again"));
+    return cb(errors.invalidObjectIdError("we couldn't add your book. Please try again"));
   }
 
   book.set("owner", owner);
@@ -44,6 +44,32 @@ Book.statics.addBook = function(owner, book, cb) {
       return cb(err);
     }
     cb(null, book);
+  });
+};
+
+Book.statics.removeBook = function(userId, bookId, cb) {
+  if(!checker.objectId(bookId)) {
+    return cb(errors.invalidObjectIdError("we couldn't remove your book. Please try again"));
+  }
+
+  this.findOne({ _id: bookId, owner: userId }, (err, book) => {
+    if(err) {
+      return cb(err);
+    }
+    if(!book) {
+      return cb(errors.bookNotFoundError("The book to be removed doesn't exist in our database"));
+    }
+    if(book.available) {
+      book.remove((err) => {
+        if(err) {
+          return cb(err);
+        }
+        cb();
+      });
+    }
+    else {
+      cb(errors.unavailableBookError("You can't delete an unavailable book"));
+    }
   });
 };
 
