@@ -62,7 +62,7 @@ const Main = React.createClass({
                     <a href="#" onClick={logout}>
                       <Glyphicon glyph="log-out"/>
                       {
-                        request.isPending ? "Loading..." :
+                        request.isPending ? " Loading..." :
                         request.error ? <span className="error-msg"> logout failed</span> : " Logout"
                       }
                     </a>
