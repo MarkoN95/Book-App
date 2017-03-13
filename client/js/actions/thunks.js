@@ -19,6 +19,7 @@ const {
  * onSuccess: this handler is wrapped in a dispatch call and should return a redux action the response is passed as it's argument
  * final: use this function for any side effects (onyl called if request succeeds).
  * finalFirst: boolean used to call the final callback before the onSuccess handler
+ * clearError: time in ms after which to remove the error from screen. Defaults to 3000ms
  *
  */
 
