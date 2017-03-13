@@ -4,7 +4,7 @@ const { Grid, Row, Col, Image, Tabs, Tab, Form, FormGroup, InputGroup, FormContr
 const { object, string, shape, bool, func } = React.PropTypes;
 
 const thunks = require("../../actions/thunks");
-const actions = require("../../actions/update");
+const actions = Object.assign({}, require("../../actions/update"), require("../../actions/books"));
 
 const styles = require("./styles.css");
 const Book = require("../Book");
@@ -16,15 +16,25 @@ const User = React.createClass({
     update: func.isRequired,
     submitSearch: func.isRequired,
     addBook: func.isRequired,
-    request: shape({
+    removeBook: func.isRequired,
+    bookSearch: shape({
       isPending: bool.isRequired,
       success: bool,
       error: object,
       data: object
+    }),
+    bookAdd: shape({
+      id: string,
+      request: shape({
+        isPending: bool.isRequired,
+        success: bool,
+        error: object,
+        data: object
+      })
     })
   },
   render: function() {
-    let { user, request, submitSearch, search, update, addBook } = this.props;
+    let { user, bookSearch, bookAdd, submitSearch, search, update, addBook, removeBook } = this.props;
 
     return(
       <Grid className="mainGrid" fluid>
@@ -57,7 +67,21 @@ const User = React.createClass({
             <div className={styles.tabsContainer}>
               <Tabs id="user-tabs">
                 <Tab eventKey={1} title="Library">
-                  Library here
+                  {
+                    user.library.length === 0 &&
+                    <p className={"text-center " + styles.noBooks}>
+                      Your library is empty. You can add books from the
+                      <span className="text-primary"> Add a Book</span> tab
+                    </p>
+                  }
+                  {
+                    user.library.length !== 0 &&
+                    user.library.map((book) => {
+                      return(
+                        <Book key={book.id} data={book} type="remove" action={removeBook}/>
+                      );
+                    })
+                  }
                 </Tab>
                 <Tab eventKey={2} title="Trades">
                   Active Trades here
@@ -78,7 +102,7 @@ const User = React.createClass({
                             <InputGroup.Button>
                               <Button type="submit" className="btnInverse">
                                 {
-                                  request.isPending ? <i className="fa fa-spinner fa-spin"></i> :
+                                  bookSearch.isPending ? <i className="fa fa-spinner fa-spin"></i> :
                                   <Glyphicon glyph="search"/>
                                 }
                               </Button>
@@ -92,17 +116,30 @@ const User = React.createClass({
                 <Row>
                   <Col xs={12}>
                     {
-                      request.success &&
-                      request.data.items &&
-                      request.data.items.map((book) => {
-                        return(<Book key={book.id} data={book} type="add" action={addBook}/>);
-                      })
+                      bookAdd.request.error &&
+                      <p className="error-msg">
+                        Book Trader: {bookAdd.request.error.message}
+                      </p>
                     }
                     {
-                      request.error &&
-                      <span className="error-msg">
-                        {request.error.message}
-                      </span>
+                      bookSearch.error &&
+                      <p className="error-msg">
+                        Google Books: {bookSearch.error.message}
+                      </p>
+                    }
+                    {
+                      bookSearch.success &&
+                      bookSearch.data.items &&
+                      bookSearch.data.items.map((book) => {
+                        return(
+                          <Book
+                            pending={bookAdd.request.isPending && book.id === bookAdd.id}
+                            key={book.id}
+                            data={book}
+                            type="add"
+                            action={addBook}/>
+                        );
+                      })
                     }
                   </Col>
                 </Row>
@@ -120,7 +157,8 @@ const mapStateToProps = function(state) {
   return {
     user: state.user,
     search: state.bookSearch.query,
-    request: state.bookSearchRequest
+    bookSearch: state.bookSearchRequest,
+    bookAdd: state.addBook
   };
 };
 
@@ -134,6 +172,10 @@ const mapDispatchToProps = function(dispatch) {
       dispatch(thunks.searchBooks());
     },
     addBook: function(book) {
+      dispatch(actions.selectBookId(book.id));
+      dispatch(thunks.addBook(book));
+    },
+    removeBook: function(book) {
       console.log(book);
     }
   };

@@ -1,6 +1,12 @@
 const axios = require("axios");
-const { REGISTER_REQUEST, LOGIN_REQUEST, LOGOUT_REQUEST, BOOK_SEARCH_REQUEST } = require("./types");
-const { request, updateUser } = Object.assign({}, require("./request"), require("./user"));
+const { request, updateUser, addToLibrary } = Object.assign({}, require("./request"), require("./user"));
+const {
+  REGISTER_REQUEST,
+  LOGIN_REQUEST,
+  LOGOUT_REQUEST,
+  BOOK_SEARCH_REQUEST,
+  BOOK_ADD_REQUEST
+} = require("./types");
 
 /*
  * makeAjaxRequest() description:
@@ -15,7 +21,7 @@ const { request, updateUser } = Object.assign({}, require("./request"), require(
  *
  */
 
-function ajaxRequest({ dispatch, type, verb, url, body, onSuccess, final, finalFirst, passData }) {
+function ajaxRequest({ dispatch, type, verb, url, body, onSuccess, final, finalFirst, passData, clearError }) {
   if(["get", "post", "put", "delete"].indexOf(verb) === -1) {
     throw new Error("invalid request verb: " + verb);
   }
@@ -29,7 +35,16 @@ function ajaxRequest({ dispatch, type, verb, url, body, onSuccess, final, finalF
     !finalFirst && typeof final === "function" && final();
   })
   .catch((err) => {
-    dispatch(request(type, "fail", err));
+    if(err.response && err.response.data) {
+      dispatch(request(type, "fail", err.response.data.error));
+    }
+    else {
+      dispatch(request(type, "fail", err));
+    }
+
+    setTimeout(function() {
+      dispatch(request(type, "clear-error"));
+    }, clearError || 3000);
   });
 }
 
@@ -93,6 +108,26 @@ module.exports = {
         verb: "get",
         url: "/api/books/search" + "?q=" + getState().bookSearch.query,
         passData: true
+      });
+    };
+  },
+  addBook: function(book) {
+    return function(dispatch) {
+
+      if(!book) {
+        let err = new Error("book id not found in search results");
+        return dispatch(request(BOOK_ADD_REQUEST, "fail", err));
+      }
+
+      ajaxRequest({
+        dispatch,
+        type: BOOK_ADD_REQUEST,
+        verb: "post",
+        url: "api/books/add",
+        body: book,
+        onSuccess: function(res) {
+          dispatch(addToLibrary(res.data));
+        }
       });
     };
   }

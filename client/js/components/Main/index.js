@@ -63,7 +63,7 @@ const Main = React.createClass({
                       <Glyphicon glyph="log-out"/>
                       {
                         request.isPending ? "Loading..." :
-                        request.error ? <span className="error-msg">logout failed</span> : "Logout"
+                        request.error ? <span className="error-msg"> logout failed</span> : " Logout"
                       }
                     </a>
                   </li>

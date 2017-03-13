@@ -52,6 +52,16 @@ module.exports = {
       return Object.assign({}, book, {
         owner: normalizePublic(book.owner)
       });
+    },
+    ownLibrary: function(book) {
+      return {
+        id: book._id,
+        title: book.title,
+        author: book.author,
+        thumbnail_url: book.thumbnail_url,
+        available: book.available,
+        createdAt: book.createdAt
+      };
     }
   }
 };

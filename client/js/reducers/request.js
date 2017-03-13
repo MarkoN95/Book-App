@@ -27,6 +27,11 @@ const createRequestReducer = function(actionType) {
               data: state.data
             };
 
+          case "clear-error":
+            return Object.assign({}, state, {
+              error: null
+            });
+
           default:
             if(process.env.NODE_ENV !== "production") {
               console.warn(

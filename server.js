@@ -5,6 +5,7 @@ const bookApi = require("./app/api/books");
 
 const passport = require("passport");
 const mongoose = require("mongoose");
+const logger = require("connect-logger");
 
 if(process.env.NODE_ENV !== "production") {
   require("dotenv").config({
@@ -21,6 +22,10 @@ const MongoStore = require("connect-mongo")(session);
 
 const express = require("express");
 const app = express();
+
+if(process.env.NODE_ENV !== "production") {
+  app.use(logger());
+}
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

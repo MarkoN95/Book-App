@@ -28,5 +28,9 @@ module.exports = {
   bookSearch: {
     query: ""
   },
-  bookSearchRequest: createRequest()
+  bookSearchRequest: createRequest(),
+  addBook: {
+    id: null,
+    request: createRequest()
+  }
 };

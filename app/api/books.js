@@ -1,6 +1,7 @@
 const ensureAuth = require("../auth/utils/ensure_auth");
 const googleBooks = require("./lib/google_books");
-const Books = require("../../models/book");
+const Book = require("../../models/book");
+const User = require("../../models/user");
 
 const express = require("express");
 const router = express.Router();
@@ -33,7 +34,24 @@ router.get("/api/books/find", (req, res) => {
 });
 
 router.post("/api/books/add", ensureAuth, (req, res) => {
+  const info = {
+    book_id: req.body.id,
+    title: req.body.title,
+    author: req.body.author,
+    thumbnail_url: req.body.thumbnail_url
+  };
 
+  Book.addBook(req.user._id, new Book(info), (err, book) => {
+    if(err) {
+      return res.status(500).send(err);
+    }
+    req.user.addBook(book, (err) => {
+      if(err) {
+        return res.status(500).send(err);
+      }
+      res.json(book.normalize("ownLibrary"));
+    });
+  });
 });
 
 router.delete("/api/books/remove", ensureAuth, (req, res) => {

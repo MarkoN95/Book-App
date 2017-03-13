@@ -1,6 +1,17 @@
 require("./user");
 const mongoose = require("mongoose");
 const normalizerPlugin = require("./plugins/normalizer");
+const checker = require("./utils/checker");
+
+const errors = {
+  invalidOwnerError: function(msg) {
+    return {
+      error: {
+        message: msg || "the owner of the book you want to add couldn't be found"
+      }
+    };
+  }
+};
 
 const Book = mongoose.Schema({
   owner: {
@@ -23,10 +34,31 @@ const autoPopulateOwner = function(next) {
   next();
 };
 
+Book.statics.addBook = function(owner, book, cb) {
+  if(!(book instanceof this)) {
+    book = new this(book);
+  }
+
+  if(!checker.objectId(owner)) {
+    return cb(errors.invalidOwnerError());
+  }
+
+  book.set("owner", owner);
+  book.set("available", true);
+  book.set("createdAt", Date.now());
+
+  book.save((err) => {
+    if(err) {
+      return cb(err);
+    }
+    cb(null, book);
+  });
+};
+
 Book.pre("find", autoPopulateOwner);
 
 Book.plugin(normalizerPlugin, {
-  normalizer: require("./utils/normalizers").book.default
+  normalizers: require("./utils/normalizers").book
 });
 
 module.exports = mongoose.model("book", Book);

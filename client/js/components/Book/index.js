@@ -1,11 +1,12 @@
 const React = require("react");
 const { Image, Button } = require("react-bootstrap");
-const { string, object, func } = React.PropTypes;
+const { string, object, func, bool } = React.PropTypes;
 
 const styles = require("./styles.css");
 
 const Book = React.createClass({
   propTypes: {
+    pending: bool,
     data: object.isRequired,
     type: string.isRequired,
     action: func.isRequired
@@ -20,7 +21,7 @@ const Book = React.createClass({
       mouseOver: bool
     });
   },
-  format: function(str) {
+  limitLength: function(str) {
     return str.length > 25 ? str.substr(0, 20) + "..." : str;
   },
   formatBook: function(book) {
@@ -32,8 +33,13 @@ const Book = React.createClass({
       thumbnail_url: v.imageLinks ? v.imageLinks.thumbnail : "client/media/dummy_book.png"
     };
   },
+  to_ing: function(word) {
+    const lastLetter = word.charAt(word.length - 1).toLowerCase();
+    const isVowel = ["a", "e", "i", "o", "u"].indexOf(lastLetter) !== -1;
+    return isVowel ? word.substr(0, word.length - 2) + "ing..." : word + "ing...";
+  },
   render: function() {
-    let { type, data } = this.props;
+    let { type, data, pending } = this.props;
     let { mouseOver } = this.state;
     let { cover, coverInfo, show, blur } = styles;
 
@@ -41,22 +47,28 @@ const Book = React.createClass({
     let book = type === "add" ? this.formatBook(data) : data;
     return(
       <div className={styles.book}>
-        <div onMouseEnter={this.toggle.bind(this, true)} onMouseLeave={this.toggle.bind(this, false)}>
+        <div
+          onMouseEnter={this.toggle.bind(this, true)}
+          onMouseLeave={this.toggle.bind(this, false)}>
+
           <Image
             src={book.thumbnail_url}
             className={mouseOver ? cover + " " + blur : cover}
             responsive
           />
-          <div className={mouseOver ? coverInfo + " " + show : coverInfo}>
-            <span><b>Title:</b></span>
-            <p>{this.format(book.title)}</p>
 
+          <div className={mouseOver ? coverInfo + " " + show : coverInfo}>
             <span><b>Author:</b></span>
-            <p>{this.format(book.author)}</p>
+            <p>{this.limitLength(book.author)}</p>
           </div>
+          
         </div>
-        <Button className="btnInverse edge"  onClick={this.props.action.bind(this, book)} block>
-          {this.props.type}
+        <Button
+          className="btnInverse edge"
+          onClick={this.props.action.bind(this, book)}
+          disabled={pending}
+          block>
+          {pending ? this.to_ing(type) : type}
         </Button>
       </div>
     );

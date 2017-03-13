@@ -49,6 +49,16 @@ const User = mongoose.Schema({
   ]
 });
 
+User.methods.addBook = function(book, cb) {
+  this.library.push(book);
+  this.save((err) => {
+    if(err) {
+      return cb(err);
+    }
+    cb();
+  });
+};
+
 const autoPopulateLibrary = function(next) {
   this.populate({
     path: "library",
