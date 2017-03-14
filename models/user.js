@@ -86,6 +86,19 @@ User.statics.removeBook = function(userId, bookId, cb) {
   );
 };
 
+User.statics.updatePublicInfo = function(userId, newInfo, cb) {
+  this.findOneAndUpdate(
+    { _id: userId },
+    { $set: { public: { full_name: newInfo.full_name, city: newInfo.city, state: newInfo.state } } },
+    (err) => {
+      if(err) {
+        return cb(err);
+      }
+      cb();
+    }
+  );
+};
+
 const autoPopulateLibrary = function(next) {
   this.populate({
     path: "library",

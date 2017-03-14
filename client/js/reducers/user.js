@@ -15,6 +15,11 @@ const user = function(state, action) {
         library: state.library.filter(book => book.id !== action.id)
       });
 
+    case types.UPDATE_PUBLIC_INFO:
+      return Object.assign({}, state, {
+        public: action.info
+      });
+
     default:
       return state;
   }

@@ -2,6 +2,7 @@ const User = require("./models/user");
 const authConfig = require("./app/auth/passport");
 const authentication = require("./app/auth/routes");
 const bookApi = require("./app/api/books");
+const settingsApi = require("./app/api/settings");
 
 const passport = require("passport");
 const mongoose = require("mongoose");
@@ -46,6 +47,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(authentication({ social: ["github", "twitter"] }));
 app.use(bookApi());
+app.use(settingsApi());
 
 app.listen(process.env.PORT, () => {
   console.log("listening on port: " + process.env.PORT);

@@ -36,5 +36,19 @@ module.exports = {
   removeBook: {
     id: null,
     request: createRequest()
+  },
+  settings: {
+    public_info: {
+      full_name: "",
+      city: "",
+      state: ""
+    },
+    public_infoRequest: createRequest(),
+    change_pw: {
+      old_pw: "",
+      new_pw: "",
+      confirm_new_pw: ""
+    },
+    change_pwRequest: createRequest()
   }
 };

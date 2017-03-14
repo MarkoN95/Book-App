@@ -21,6 +21,7 @@ const user              = require("./user");
 const logoutRequest     = createRequestReducer(LOGOUT_REQUEST);
 const bookSearch        = createFormReducer("bookSearch");
 const bookSearchRequest = createRequestReducer(BOOK_SEARCH_REQUEST);
+const settings          = require("./settings");
 
 const addBook = composeReducers({
   id: function(state, action) {
@@ -59,5 +60,6 @@ module.exports = composeReducers({
   bookSearch,
   bookSearchRequest,
   addBook,
-  removeBook
+  removeBook,
+  settings
 });

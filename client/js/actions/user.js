@@ -18,5 +18,11 @@ module.exports = {
       type: types.REMOVE_FROM_LIBRARY,
       id
     };
+  },
+  updatePublicInfo: function(info) {
+    return {
+      type: types.UPDATE_PUBLIC_INFO,
+      info
+    };
   }
 };

@@ -1,12 +1,20 @@
 const axios = require("axios");
-const { request, updateUser, addToLibrary, removeFromLibrary } = Object.assign({}, require("./request"), require("./user"));
+const {
+  request,
+  updateUser,
+  addToLibrary,
+  removeFromLibrary,
+  updatePublicInfo
+} = Object.assign({}, require("./request"), require("./user"));
 const {
   REGISTER_REQUEST,
   LOGIN_REQUEST,
   LOGOUT_REQUEST,
   BOOK_SEARCH_REQUEST,
   BOOK_ADD_REQUEST,
-  BOOK_REMOVE_REQUEST
+  BOOK_REMOVE_REQUEST,
+  UPDATE_PUBLIC_REQUEST,
+  CHANGE_PW_REQUEST
 } = require("./types");
 
 /*
@@ -148,6 +156,33 @@ module.exports = {
         url: "/api/books/remove?id=" + book.id,
         onSuccess: function() {
           dispatch(removeFromLibrary(book.id));
+        }
+      });
+    };
+  },
+  changePublicInfo: function() {
+    return function(dispatch, getState) {
+      ajaxRequest({
+        dispatch,
+        type: UPDATE_PUBLIC_REQUEST,
+        verb: "put",
+        url: "/api/settings/public",
+        body: getState().settings.public_info,
+        onSuccess: function() {
+          dispatch(updatePublicInfo(getState().settings.public_info));
+        }
+      });
+    };
+  },
+  changePassword: function() {
+    return function(dispatch, getState) {
+      ajaxRequest({
+        dispatch,
+        type: CHANGE_PW_REQUEST,
+        verb: "put",
+        body: getState().settings.change_pw,
+        onSuccess: function() {
+          dispatch(updateUser(null));
         }
       });
     };
