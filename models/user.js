@@ -54,7 +54,7 @@ const User = mongoose.Schema({
 
 User.statics.addBook = function(userId, book, cb) {
   if(!checker.objectId(userId)) {
-    return cb(errors.invalidObjectIdError("we couldn't add your book. please try again"));
+    return cb(errors.invalidObjectIdError(400, "we couldn't add your book. please try again"));
   }
 
   this.findOneAndUpdate(
@@ -71,7 +71,7 @@ User.statics.addBook = function(userId, book, cb) {
 
 User.statics.removeBook = function(userId, bookId, cb) {
   if(!checker.objectId(userId)) {
-    return cb(errors.invalidObjectIdError("we couldn't remove your book. please try again"));
+    return cb(errors.invalidObjectIdError(400, "we couldn't remove your book. please try again"));
   }
 
   this.findOneAndUpdate(
@@ -97,6 +97,42 @@ User.statics.updatePublicInfo = function(userId, newInfo, cb) {
       cb();
     }
   );
+};
+
+User.statics.changePassword = function(userId, data, cb) {
+
+  if(data.new_pw !== data.confirm_new_pw) {
+    return cb(errors.passwordsDontMatchError());
+  }
+
+  this.findOne({ _id: userId })
+    .select("+local.hash +local.salt")
+    .exec((err, user) => {
+      if(err) {
+        return cb(err);
+      }
+      user.validatePassword(data.old_pw, (err, status) => {
+        if(err) {
+          return cb(err);
+        }
+
+        if(status === false) {
+          return cb(errors.wrongOldPasswordError());
+        }
+
+        user.setPassword(data.new_pw, (err, updatedUser) => {
+          if(err) {
+            return cb(err);
+          }
+          updatedUser.save((err) => {
+            if(err) {
+              return cb(err);
+            }
+            cb();
+          });
+        });
+      });
+    });
 };
 
 const autoPopulateLibrary = function(next) {

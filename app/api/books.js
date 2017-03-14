@@ -6,15 +6,7 @@ const User = require("../../models/user");
 const express = require("express");
 const router = express.Router();
 
-const errors = {
-  invalidQueryError: function(msg) {
-    return {
-      error: {
-        message: msg || "invalid query parameters for the booksearch"
-      }
-    };
-  }
-};
+const errors = require("../../models/utils/errors");
 
 function checkQuery(query) {
   return typeof query === "object" && query.q;
@@ -44,7 +36,7 @@ router.post("/api/books/add", ensureAuth, (req, res) => {
 
   Book.addBook(req.user._id, new Book(info), (err, book) => {
     if(err) {
-      return res.status(500).send(err);
+      return res.status(err.status || 500).send(err);
     }
     User.addBook(req.user._id, book, (err) => {
       if(err) {
@@ -56,14 +48,14 @@ router.post("/api/books/add", ensureAuth, (req, res) => {
 });
 
 router.delete("/api/books/remove", ensureAuth, (req, res) => {
-  
+
   Book.removeBook(req.user._id, req.query.id, (err) => {
     if(err) {
-      return res.status(500).send(err);
+      return res.status(err.status || 500).send(err);
     }
     User.removeBook(req.user._id, req.query.id, (err) => {
       if(err) {
-        return res.status(500).send(err);
+        return res.status(err.status || 500).send(err);
       }
       res.status(204).end();
     });

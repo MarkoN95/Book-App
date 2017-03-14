@@ -4,18 +4,11 @@ const semver = require("semver");
 
 const pbkdf2DigestSupport = semver.gte(process.version, "0.12.0");
 
-const errors = {
-  existingUserError: function(msg) {
-    return {
-      error: {
-        message: msg || "this username is already taken"
-      }
-    };
-  },
+const errors = Object.assign(require("../utils/errors"), {
   missingFieldsError: function(fields = [], msg) {
     return new TypeError(msg || "localAuthPlugin() fields: [" + fields.join(" ") + "] are missing in options");
   }
-};
+});
 
 const localAuthPlugin = function(schema, opt) {
   const options = {
@@ -63,6 +56,7 @@ const localAuthPlugin = function(schema, opt) {
         if(err) {
           return cb(err);
         }
+
         this.set(hashField, hashbuffer.toString(options.encoding));
         this.set(saltField, salt);
 

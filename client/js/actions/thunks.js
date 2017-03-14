@@ -174,15 +174,19 @@ module.exports = {
       });
     };
   },
-  changePassword: function() {
+  changePassword: function(ownProps) {
     return function(dispatch, getState) {
       ajaxRequest({
         dispatch,
         type: CHANGE_PW_REQUEST,
         verb: "put",
+        url: "/api/settings/password",
         body: getState().settings.change_pw,
         onSuccess: function() {
           dispatch(updateUser(null));
+        },
+        final: function() {
+          ownProps.router.push("/login");
         }
       });
     };

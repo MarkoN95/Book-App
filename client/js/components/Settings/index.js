@@ -25,10 +25,11 @@ const Settings = React.createClass({
     }),
     updateInput: func.isRequired,
     updatePassword: func.isRequired,
-    changePublicInfo: func.isRequired
+    changePublicInfo: func.isRequired,
+    changePassword: func.isRequired
   },
   render: function() {
-    let { updateInput, updatePassword, public_info, change_pw, public_infoRequest, change_pwRequest, changePublicInfo } = this.props;
+    let { updateInput, updatePassword, public_info, change_pw, public_infoRequest, change_pwRequest, changePublicInfo, changePassword } = this.props;
     return(
       <Grid className="mainGrid" fluid>
         <Row>
@@ -85,7 +86,7 @@ const Settings = React.createClass({
           <Col md={6} sm={8} xs={10} mdOffset={3} smOffset={2} xsOffset={1}>
             <h3 className="text-center">Change your password</h3>
             <p>(You will be logged out afterwards)</p>
-            <Form>
+            <Form onSubmit={changePassword}>
               <FormGroup>
                 <ControlLabel>Old Password</ControlLabel>
                 <FormControl
@@ -146,7 +147,7 @@ const mapStateToProps = function(state) {
   };
 };
 
-const mapDispatchToProps = function(dispatch) {
+const mapDispatchToProps = function(dispatch, ownProps) {
   return {
     updateInput: function(e) {
       dispatch(actions.updateFormInput("public_info", e.target.name, e.target.value));
@@ -160,7 +161,7 @@ const mapDispatchToProps = function(dispatch) {
     },
     changePassword: function(e) {
       e.preventDefault();
-      //dispatch(thunks.changePassword());
+      dispatch(thunks.changePassword(ownProps));
     }
   };
 };
