@@ -52,11 +52,11 @@ const Main = React.createClass({
                   <NavItem>{user.username}</NavItem>
                 </LinkContainer>
                 <NavDropdown title="" id="nav-dropdown">
-                  <li role="presentation">
-                    <Link to="/user/settings">
+                  <LinkContainer to="/user/settings">
+                    <MenuItem>
                       <Glyphicon glyph="cog"/> Settings
-                    </Link>
-                  </li>
+                    </MenuItem>
+                  </LinkContainer>
                   <MenuItem divider/>
                   <li role="presentation">
                     <a href="#" onClick={logout}>
