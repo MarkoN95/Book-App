@@ -5,7 +5,8 @@ const {
   addToLibrary,
   removeFromLibrary,
   updatePublicInfo,
-  toggleModal
+  toggleModal,
+  updateFormInput
 } = Object.assign({}, require("./request"), require("./user"), require("./update"));
 
 const {
@@ -17,8 +18,7 @@ const {
   BOOK_REMOVE_REQUEST,
   UPDATE_PUBLIC_REQUEST,
   CHANGE_PW_REQUEST,
-  DELETE_ACCOUNT_REQUEST,
-  TOGGLE_MODAL
+  DELETE_ACCOUNT_REQUEST
 } = require("./types");
 
 /*
@@ -209,6 +209,22 @@ module.exports = {
         final: function() {
           ownProps.router.push("/");
         }
+      });
+    };
+  },
+  purgeForm: function(form) {
+    return function(dispatch) {
+      
+      const formFields = {
+        login: ["username", "password"],
+        register: ["username", "email", "password", "confirm_password", "full_name", "city", "state"],
+        bookSearch: ["query"],
+        public_info: ["full_name", "city", "state"],
+        change_pw: ["old_pw", "new_pw", "confirm_new_pw"]
+      };
+
+      formFields[form].forEach((field) => {
+        dispatch(updateFormInput(form, field, ""));
       });
     };
   }
