@@ -1,3 +1,10 @@
 .green {
   color: #22aa22;
 }
+
+.dangerBorder {
+  box-sizing: border-box;
+  padding: 8px;
+  border: 2px solid #d9534f;
+  border-radius: 5px;
+}

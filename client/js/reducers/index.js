@@ -49,7 +49,6 @@ const removeBook = composeReducers({
   request: createRequestReducer(BOOK_REMOVE_REQUEST)
 });
 
-
 module.exports = composeReducers({
   login,
   loginRequest,

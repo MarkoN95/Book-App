@@ -49,6 +49,10 @@ module.exports = {
       new_pw: "",
       confirm_new_pw: ""
     },
-    change_pwRequest: createRequest()
+    change_pwRequest: createRequest(),
+    deleteAccount: {
+      visible: false,
+      request: createRequest()
+    }
   }
 };

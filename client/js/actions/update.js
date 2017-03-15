@@ -8,5 +8,10 @@ module.exports = {
       field,
       value
     };
+  },
+  toggleModal: function() {
+    return {
+      type: types.TOGGLE_MODAL
+    };
   }
 };

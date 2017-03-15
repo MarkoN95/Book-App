@@ -4,8 +4,10 @@ const {
   updateUser,
   addToLibrary,
   removeFromLibrary,
-  updatePublicInfo
-} = Object.assign({}, require("./request"), require("./user"));
+  updatePublicInfo,
+  toggleModal
+} = Object.assign({}, require("./request"), require("./user"), require("./update"));
+
 const {
   REGISTER_REQUEST,
   LOGIN_REQUEST,
@@ -14,7 +16,9 @@ const {
   BOOK_ADD_REQUEST,
   BOOK_REMOVE_REQUEST,
   UPDATE_PUBLIC_REQUEST,
-  CHANGE_PW_REQUEST
+  CHANGE_PW_REQUEST,
+  DELETE_ACCOUNT_REQUEST,
+  TOGGLE_MODAL
 } = require("./types");
 
 /*
@@ -25,7 +29,7 @@ const {
  * verb: http verb (get, post, put, delete)
  * body: optional request body
  * onSuccess: this handler is wrapped in a dispatch call and should return a redux action the response is passed as it's argument
- * final: use this function for any side effects (onyl called if request succeeds).
+ * final: use this function for any side effects (only called if request succeeds).
  * finalFirst: boolean used to call the final callback before the onSuccess handler
  * clearError: time in ms after which to remove the error from screen. Defaults to 3000ms
  *
@@ -187,6 +191,23 @@ module.exports = {
         },
         final: function() {
           ownProps.router.push("/login");
+        }
+      });
+    };
+  },
+  deleteAccount: function(ownProps) {
+    return function(dispatch) {
+      ajaxRequest({
+        dispatch,
+        type: DELETE_ACCOUNT_REQUEST,
+        verb: "delete",
+        url: "/api/settings/delete",
+        onSuccess: function() {
+          dispatch(updateUser(null));
+          dispatch(toggleModal());
+        },
+        final: function() {
+          ownProps.router.push("/");
         }
       });
     };

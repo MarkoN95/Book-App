@@ -135,6 +135,20 @@ User.statics.changePassword = function(userId, data, cb) {
     });
 };
 
+User.statics.removeUser = function(userId, cb) {
+  this.findOne({ _id: userId }, (err, user) => {
+    if(err) {
+      return cb(err);
+    }
+    user.remove((err) => {
+      if(err) {
+        return cb(err);
+      }
+      cb();
+    });
+  });
+};
+
 const autoPopulateLibrary = function(next) {
   this.populate({
     path: "library",
@@ -179,6 +193,18 @@ const autoPopulateLibraryAndTrades = function(next) {
 
 User.pre("find", autoPopulateLibrary);
 User.pre("findOne", autoPopulateLibraryAndTrades);
+
+User.pre("remove", function(next) {
+  mongoose.model("book").remove({ owner: this._id }, (err) => {
+    if(err) {
+      return next(err);
+    }
+    next();
+  });
+});
+
+// TODO:
+// Cancel all pending trades upon account deletion
 
 User.plugin(localAuthPlugin, {
   usernameField: "local.username",

@@ -2,10 +2,17 @@ const React = require("react");
 const { connect } = require("react-redux");
 const { Grid, Row, Col, Form, FormGroup, FormControl, ControlLabel, Button, Glyphicon } = require("react-bootstrap");
 const { object, shape, bool, func } = React.PropTypes;
+const Confirm = require("./confirm");
 
+const types = require("../../actions/types");
 const actions = require("../../actions/update");
 const thunks = require("../../actions/thunks");
 const styles = require("./styles.css");
+
+const modal = {
+  title: "Are you sure?",
+  message: "This will delete everything. Your personal information and your library. All your pending trades will be canceled"
+};
 
 const Settings = React.createClass({
   propTypes: {
@@ -26,10 +33,32 @@ const Settings = React.createClass({
     updateInput: func.isRequired,
     updatePassword: func.isRequired,
     changePublicInfo: func.isRequired,
-    changePassword: func.isRequired
+    changePassword: func.isRequired,
+    toggleModal: func.isRequired,
+    deleteAccount: func.isRequired,
+    visible: bool.isRequired,
+    deleteAccountRequest: shape({
+      isPending: bool.isRequired,
+      success: bool,
+      error: object,
+      data: object
+    })
   },
   render: function() {
-    let { updateInput, updatePassword, public_info, change_pw, public_infoRequest, change_pwRequest, changePublicInfo, changePassword } = this.props;
+    let {
+      updateInput,
+      updatePassword,
+      public_info,
+      change_pw,
+      public_infoRequest,
+      change_pwRequest,
+      changePublicInfo,
+      changePassword,
+      toggleModal,
+      deleteAccount,
+      visible,
+      deleteAccountRequest
+    } = this.props;
     return(
       <Grid className="mainGrid" fluid>
         <Row>
@@ -133,6 +162,29 @@ const Settings = React.createClass({
             </Form>
           </Col>
         </Row>
+        <Row>
+          <Col md={6} sm={8} xs={10} mdOffset={3} smOffset={2} xsOffset={1}>
+            <h3 className="text-center text-danger">Danger Zone</h3>
+            <div className={styles.dangerBorder}>
+              <Button bsStyle="danger" onClick={toggleModal}>
+                Delete Account
+              </Button>
+              {
+                deleteAccountRequest.error &&
+                <p className="error-msg">
+                  {deleteAccountRequest.error.message}
+                </p>
+              }
+              <Confirm
+                visible={visible}
+                cancel={toggleModal}
+                confirm={deleteAccount}
+                title={modal.title}
+                message={modal.message}
+              />
+            </div>
+          </Col>
+        </Row>
       </Grid>
     );
   }
@@ -143,7 +195,9 @@ const mapStateToProps = function(state) {
     public_info: state.settings.public_info,
     public_infoRequest: state.settings.public_infoRequest,
     change_pw: state.settings.change_pw,
-    change_pwRequest: state.settings.change_pwRequest
+    change_pwRequest: state.settings.change_pwRequest,
+    visible: state.settings.deleteAccount.visible,
+    deleteAccountRequest: state.settings.deleteAccount.request
   };
 };
 
@@ -162,6 +216,12 @@ const mapDispatchToProps = function(dispatch, ownProps) {
     changePassword: function(e) {
       e.preventDefault();
       dispatch(thunks.changePassword(ownProps));
+    },
+    toggleModal: function() {
+      dispatch(actions.toggleModal());
+    },
+    deleteAccount: function() {
+      dispatch(thunks.deleteAccount(ownProps));
     }
   };
 };

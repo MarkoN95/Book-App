@@ -24,6 +24,17 @@ router.put("/api/settings/password", ensureAuth, (req, res) => {
   });
 });
 
+router.delete("/api/settings/delete", (req, res) => {
+  User.removeUser(req.user._id, (err) => {
+    if(err) {
+      return res.status(err.status || 500).send(err);
+    }
+    req.logout();
+    req.session.destroy();
+    res.status(204).end();
+  });
+});
+
 module.exports = function() {
   return router;
 };
