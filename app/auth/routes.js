@@ -50,7 +50,7 @@ module.exports = function authRoutes(opt) {
 
     User.register(new User(userinfo), req.body.password, (err, user) => {
       if(err) {
-        return res.json(err);
+        return res.status(err.status || 500).send(err);
       }
       passport.authenticate("local")(req, res, () => {
         res.json(user.normalize("ownProfile"));

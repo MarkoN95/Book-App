@@ -32,7 +32,7 @@ router.post("/api/books/add", ensureAuth, check_input("book"), (req, res) => {
     }
     User.addBook(req.user._id, book, (err) => {
       if(err) {
-        return res.status(500).send(err);
+        return res.status(err.status || 500).send(err);
       }
       res.json(book.normalize("ownLibrary"));
     });
