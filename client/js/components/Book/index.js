@@ -1,11 +1,12 @@
 const React = require("react");
-const { Image, Button } = require("react-bootstrap");
+const { Image, Button, Glyphicon } = require("react-bootstrap");
 const { string, object, func, bool } = React.PropTypes;
 
 const styles = require("./styles.css");
 
 const Book = React.createClass({
   propTypes: {
+    success: bool,
     pending: bool,
     data: object.isRequired,
     type: string.isRequired,
@@ -26,11 +27,13 @@ const Book = React.createClass({
   },
   formatBook: function(book) {
     let v = book.volumeInfo;
+    let hasImage = v.imageLinks && v.imageLinks.thumbnail;
     return {
       id: book.id,
       title: v.title || "",
       author: v.authors ? v.authors[0] : "",
-      thumbnail_url: v.imageLinks ? v.imageLinks.thumbnail : "client/media/dummy_book.png"
+      thumbnail_url: v.imageLinks ? v.imageLinks.thumbnail : "client/media/dummy_book.png",
+      hasImage: hasImage
     };
   },
   to_ing: function(word) {
@@ -39,7 +42,7 @@ const Book = React.createClass({
     return isVowel ? word.substr(0, word.length - 2) + "ing..." : word + "ing...";
   },
   render: function() {
-    let { type, data, pending } = this.props;
+    let { type, data, pending, success } = this.props;
     let { mouseOver } = this.state;
     let { cover, coverInfo, show, blur } = styles;
 
@@ -58,10 +61,17 @@ const Book = React.createClass({
           />
 
           <div className={mouseOver ? coverInfo + " " + show : coverInfo}>
-            <span><b>Author:</b></span>
-            <p>{this.limitLength(book.author)}</p>
+            {
+              !book.hasImage &&
+              <span>
+                <b>Title: </b>{book.title}<br/>
+              </span>
+            }
+            <span>
+              <b>Author:<br/></b>{this.limitLength(book.author)}
+            </span>
           </div>
-          
+
         </div>
         <Button
           className="btnInverse edge"
@@ -69,6 +79,11 @@ const Book = React.createClass({
           disabled={pending}
           block>
           {pending ? this.to_ing(type) : type}
+          {" "}
+          {
+            success &&
+            <Glyphicon glyph="ok"/>
+          }
         </Button>
       </div>
     );

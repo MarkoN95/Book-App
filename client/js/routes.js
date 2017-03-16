@@ -8,9 +8,14 @@ const Register = require("./components/Register");
 const User = require("./components/User");
 const Settings = require("./components/Settings");
 
-const { purgeForm } = require("./actions/thunks");
+const { purgeForm, populatePublicInfoForm } = require("./actions/thunks");
+const composeSync = require("./utils/compose_hooks");
 
 const routes = function(store) {
+
+  const populate = function() {
+    store.dispatch(populatePublicInfoForm());
+  };
 
   const purge = function() {
     const args = [].concat.apply([], arguments);
@@ -50,7 +55,7 @@ const routes = function(store) {
       <Route
         path="/user/settings"
         component={Settings}
-        onEnter={requireAuth}
+        onEnter={composeSync(requireAuth, populate)}
         onLeave={purge("public_info", "change_pw")}
       />
     </Route>

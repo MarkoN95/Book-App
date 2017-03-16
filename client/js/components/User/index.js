@@ -154,6 +154,7 @@ const User = React.createClass({
                       bookSearch.data.items.map((book) => {
                         return(
                           <Book
+                            success={bookAdd.id === book.id ? bookAdd.request.success : null}
                             pending={bookAdd.request.isPending && book.id === bookAdd.id}
                             key={book.id}
                             data={book}

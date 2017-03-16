@@ -214,7 +214,7 @@ module.exports = {
   },
   purgeForm: function(form) {
     return function(dispatch) {
-      
+
       const formFields = {
         login: ["username", "password"],
         register: ["username", "email", "password", "confirm_password", "full_name", "city", "state"],
@@ -226,6 +226,21 @@ module.exports = {
       formFields[form].forEach((field) => {
         dispatch(updateFormInput(form, field, ""));
       });
+    };
+  },
+  populatePublicInfoForm: function() {
+    return function(dispatch, getState) {
+      const user = getState().user;
+
+      if(!user) {
+        return;
+      }
+
+      const _public = user.public;
+
+      dispatch(updateFormInput("public_info", "full_name", _public.full_name));
+      dispatch(updateFormInput("public_info", "city", _public.city));
+      dispatch(updateFormInput("public_info", "state", _public.state));
     };
   }
 };
