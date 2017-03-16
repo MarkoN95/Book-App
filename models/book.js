@@ -14,6 +14,7 @@ const Book = mongoose.Schema({
   title: { type: String, trim: true },
   author: { type: String, trim: true },
   thumbnail_url: { type: String, default: "/client/media/dummy_book.png" },
+  hasImage: Boolean,
   available: Boolean,
   createdAt: Date
 });

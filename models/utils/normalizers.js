@@ -59,6 +59,7 @@ const book_normalizers = {
       title: book.title,
       author: book.author,
       thumbnail_url: book.thumbnail_url,
+      hasImage: book.hasImage,
       available: book.available,
       createdAt: book.createdAt
     };
