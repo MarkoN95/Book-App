@@ -13,6 +13,7 @@ function normalizeTrades(user) {
         username: trade.acceptand[alm].username,
         image_url: trade.acceptand[alm].image_url
       }
+      //don't forget to add the stageing areas etc.
     };
   });
 
@@ -39,7 +40,10 @@ const user_normalizers = {
     return Object.assign({},
        normalizePublic(user),
        normalizeOwnLibrary(user),
-       normalizeTrades(user)
+       normalizeTrades(user),
+      {
+        message_cache: user.message_cache
+      }
      );
   },
   profile: function(user) {
@@ -50,7 +54,7 @@ const user_normalizers = {
 const book_normalizers = {
   "default": function(book) {
     return Object.assign({}, book, {
-      owner: normalizePublic(book.owner)
+      owner: normalizePublic(book.owner) //make sh different to pass user id as well
     });
   },
   ownLibrary: function(book) {

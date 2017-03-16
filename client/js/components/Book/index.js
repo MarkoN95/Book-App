@@ -27,7 +27,7 @@ const Book = React.createClass({
   },
   formatBook: function(book) {
     let v = book.volumeInfo;
-    let hasImage = v.imageLinks && v.imageLinks.thumbnail;
+    let hasImage = !!(v.imageLinks && v.imageLinks.thumbnail);
     return {
       id: book.id,
       title: v.title || "",

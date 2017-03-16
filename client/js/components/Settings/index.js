@@ -4,7 +4,6 @@ const { Grid, Row, Col, Form, FormGroup, FormControl, ControlLabel, Button, Glyp
 const { object, shape, bool, func } = React.PropTypes;
 const Confirm = require("./confirm");
 
-const types = require("../../actions/types");
 const actions = require("../../actions/update");
 const thunks = require("../../actions/thunks");
 const styles = require("./styles.css");

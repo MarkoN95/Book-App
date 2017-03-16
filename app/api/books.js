@@ -6,32 +6,24 @@ const User = require("../../models/user");
 const express = require("express");
 const router = express.Router();
 
-const errors = require("../../models/utils/errors");
+const check_input = require("../utils/input_checker");
 
-function checkQuery(query) {
-  return typeof query === "object" && query.q;
-}
-
-router.get("/api/books/search", (req, res) => {
-  if(checkQuery(req.query)) {
-    googleBooks(req.query).pipe(res);
-  }
-  else {
-    res.status(400).json(errors.invalidQueryError());
-  }
+router.get("/api/books/search", check_input("search"), (req, res) => {
+  googleBooks(req.query).pipe(res);
 });
 
 router.get("/api/books/find", (req, res) => {
   //find books from the marketplace here
 });
 
-router.post("/api/books/add", ensureAuth, (req, res) => {
+router.post("/api/books/add", ensureAuth, check_input("book"), (req, res) => {
 
   const info = {
     book_id: req.body.id,
     title: req.body.title,
     author: req.body.author,
-    thumbnail_url: req.body.thumbnail_url
+    thumbnail_url: req.body.thumbnail_url,
+    hasImage: req.body.hasImage
   };
 
   Book.addBook(req.user._id, new Book(info), (err, book) => {

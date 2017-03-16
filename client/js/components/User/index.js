@@ -139,17 +139,17 @@ const User = React.createClass({
                     {
                       bookAdd.request.error &&
                       <p className="error-msg">
-                        Book Trader: {bookAdd.request.error.message}
+                        {bookAdd.request.error.message}
                       </p>
                     }
                     {
                       bookSearch.error &&
                       <p className="error-msg">
-                        Google Books: {bookSearch.error.message}
+                        {bookSearch.error.message}
                       </p>
                     }
                     {
-                      bookSearch.success &&
+                      bookSearch.data &&
                       bookSearch.data.items &&
                       bookSearch.data.items.map((book) => {
                         return(

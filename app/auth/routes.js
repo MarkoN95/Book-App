@@ -5,6 +5,7 @@ const express = require("express");
 const router = express.Router();
 
 const ensureAuth = require("./utils/ensure_auth");
+const check_input = require("../utils/input_checker");
 
 module.exports = function authRoutes(opt) {
   if(!Array.isArray(opt.social)) {
@@ -23,7 +24,7 @@ module.exports = function authRoutes(opt) {
     );
   });
 
-  router.post("/auth/local/login", passport.authenticate("local"), (req, res) => {
+  router.post("/auth/local/login", check_input("login"), passport.authenticate("local"), (req, res) => {
     res.json(req.user.normalize("ownProfile"));
   });
 
@@ -33,7 +34,7 @@ module.exports = function authRoutes(opt) {
     res.status(204).end();
   });
 
-  router.post("/auth/local/register", (req, res) => {
+  router.post("/auth/local/register", check_input("register"), (req, res) => {
     const userinfo = {
       local: {
         username: req.body.username,

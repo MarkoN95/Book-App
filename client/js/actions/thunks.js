@@ -21,6 +21,7 @@ const {
   DELETE_ACCOUNT_REQUEST
 } = require("./types");
 
+const formatError = require("../utils/format_error");
 /*
  * makeAjaxRequest() description:
  *
@@ -39,26 +40,48 @@ function ajaxRequest({ dispatch, type, verb, url, body, onSuccess, final, finalF
   if(["get", "post", "put", "delete"].indexOf(verb) === -1) {
     throw new Error("invalid request verb: " + verb);
   }
+  function noop() {}
+  if(typeof onSuccess !== "function") {
+    onSuccess = noop;
+  }
+  if(typeof final !== "function") {
+    final = noop;
+  }
 
   dispatch(request(type, "begin"));
+
   axios[verb](url, body)
   .then((res) => {
     dispatch(request(type, "done", null, passData ? res.data : null));
-    finalFirst && typeof final === "function" && final();
-    typeof onSuccess === "function" && onSuccess(res);
-    !finalFirst && typeof final === "function" && final();
-  })
-  .catch((err) => {
-    if(err.response && err.response.data) {
-      dispatch(request(type, "fail", err.response.data.error));
+
+    if(finalFirst) {
+      final();
+      onSuccess(res);
     }
     else {
-      dispatch(request(type, "fail", err));
+      onSuccess(res);
+      final();
     }
+  })
+  .catch((err) => {
+    let formattedError = formatError(err, type);
+    dispatch(request(type, "fail", formattedError));
 
     setTimeout(function() {
       dispatch(request(type, "clear-error"));
-    }, clearError || 3000);
+    }, clearError || 5000);
+
+    if(process.env.NODE_ENV !== "production") {
+      if(formatError.throw) {
+        throw err;
+      }
+    }
+  })
+  .catch((err) => {
+    if(process.env.NODE_ENV !== "production") {
+      console.warn("Error caught by Promise.catch()");
+      console.error(err);
+    }
   });
 }
 
