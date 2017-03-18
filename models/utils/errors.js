@@ -2,7 +2,7 @@ module.exports = {
   existingUserError: function(status, msg) {
     return {
       error: {
-        message: msg || "this username is already taken"
+        message: msg || "This username is already taken"
       },
       status: status || 400
     };
@@ -10,7 +10,7 @@ module.exports = {
   invalidObjectIdError: function(status, msg) {
     return {
       error: {
-        message: msg || "object id is invalid"
+        message: msg || "Object id is invalid"
       },
       status: status || 400
     };
@@ -18,7 +18,7 @@ module.exports = {
   unavailableBookError: function(status, msg) {
     return {
       error: {
-        message: msg || "you can't perform any actions on a book that is in an active trade"
+        message: msg || "You can't perform any actions on a book that is in an active trade"
       },
       status: status || 400
     };
@@ -26,7 +26,7 @@ module.exports = {
   bookNotFoundError: function(status, msg) {
     return {
       error: {
-        message: msg || "the book is not in our database"
+        message: msg || "The book is not in our database"
       },
       status: status || 400
     };
@@ -34,15 +34,15 @@ module.exports = {
   passwordsDontMatchError: function(status, msg) {
     return {
       error: {
-        message: msg || "passwords don't match"
+        message: msg || "Passwords don't match"
       },
       status: status || 400,
     };
   },
-  wrongOldPasswordError: function(msg) {
+  wrongOldPasswordError: function(status, msg) {
     return {
       error: {
-        message: msg || "old password is not correct"
+        message: msg || "Old password is not correct"
       },
       status: status || 400,
     };
@@ -50,7 +50,7 @@ module.exports = {
   invalidQueryError: function(status, msg) {
     return {
       error: {
-        message: msg || "invalid query parameters for the booksearch"
+        message: msg || "Invalid query parameters for the booksearch"
       },
       status: status || 400
     };

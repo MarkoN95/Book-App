@@ -100,11 +100,6 @@ User.statics.updatePublicInfo = function(userId, newInfo, cb) {
 };
 
 User.statics.changePassword = function(userId, data, cb) {
-
-  if(data.new_pw !== data.confirm_new_pw) {
-    return cb(errors.passwordsDontMatchError());
-  }
-
   this.findOne({ _id: userId })
     .select("+local.hash +local.salt")
     .exec((err, user) => {

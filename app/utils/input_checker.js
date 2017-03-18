@@ -53,6 +53,22 @@ function checkBook(book) {
   return true;
 }
 
+function checkSettings(body) {
+  if(body.new_pw === "") {
+    return "Please enter a new password";
+  }
+
+  if(body.confirm_new_pw === "") {
+    return "Plase confirm your password";
+  }
+
+  if(body.new_pw !== body.confirm_new_pw) {
+    return "New passwords don't match";
+  }
+
+  return true;
+}
+
 module.exports = function check_input(type) {
   return function(req, res, next) {
     let isValid;
@@ -71,6 +87,10 @@ module.exports = function check_input(type) {
 
       case "book":
         isValid = checkBook(req.body);
+        break;
+
+      case "settings":
+        isValid = checkSettings(req.body);
         break;
 
       default:

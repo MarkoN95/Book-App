@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
+const check_input = require("../utils/input_checker");
 const ensureAuth = require("../auth/utils/ensure_auth");
 const User = require("../../models/user");
 
@@ -13,7 +14,7 @@ router.put("/api/settings/public", ensureAuth, (req, res) => {
   });
 });
 
-router.put("/api/settings/password", ensureAuth, (req, res) => {
+router.put("/api/settings/password", ensureAuth, check_input("settings"), (req, res) => {
   User.changePassword(req.user._id, req.body, (err) => {
     if(err) {
       return res.status(err.status || 500).send(err);
