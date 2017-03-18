@@ -116,7 +116,7 @@ const User = React.createClass({
                             <FormControl
                               name="query"
                               type="text"
-                              placeholder="book title"
+                              placeholder="title or author"
                               value={search}
                               onChange={update}
                             />

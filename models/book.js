@@ -74,6 +74,44 @@ Book.statics.removeBook = function(userId, bookId, cb) {
   });
 };
 
+Book.statics.searchMarketplace = function(q, cb) {
+  if(q.option) {
+    let dbquery;
+    switch(q.option) {
+      case "all":
+        dbquery = this.find({});
+        break;
+
+      case "latest":
+        dbquery = this.find().sort({ createdAt: -1 }).limit(50);
+        break;
+
+      default:
+        return cb(errors.invalidQueryError(400, "Unknown query option supplied"));
+    }
+    dbquery.exec((err, books) => {
+      if(err) {
+        return cb(err);
+      }
+      cb(null, books);
+    });
+  }
+  else {
+    this.find({
+      $or: [
+        { title: new RegExp(q.query, "i") },
+        { author: new RegExp(q.query, "i") }
+      ]
+    },
+    (err, books) => {
+      if(err) {
+        return cb(err);
+      }
+      cb(null, books);
+    });
+  }
+};
+
 Book.pre("find", autoPopulateOwner);
 
 Book.plugin(normalizerPlugin, {

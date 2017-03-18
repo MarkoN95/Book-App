@@ -3,6 +3,7 @@ const { Route, IndexRoute } = require("react-router");
 
 const Main = require("./components/Main");
 const Home = require("./components/Home");
+const Marketplace = require("./components/Marketplace");
 const Login = require("./components/Login");
 const Register = require("./components/Register");
 const User = require("./components/User");
@@ -36,6 +37,10 @@ const routes = function(store) {
   return (
     <Route path="/" component={Main}>
       <IndexRoute component={Home}/>
+      <Route
+        path="/marketplace"
+        component={Marketplace}
+      />
       <Route
         path="/login"
         component={Login}

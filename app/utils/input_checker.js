@@ -2,12 +2,20 @@ function isEmail(str) {
   return /[^\s@]+@[^\s@]+\.[^\s@]+/.test(str);
 }
 
+function isNonEmptyString(str) {
+  return typeof str === "string" && str !== "";
+}
+
+function isOption(opt) {
+  return isNonEmptyString(opt) && (opt === "all" || opt === "latest");
+}
+
 function checkLogin(body) {
-  if(body.username === "") {
+  if(!isNonEmptyString(body.username)) {
     return "Please enter your username";
   }
 
-  if(body.password === "") {
+  if(!isNonEmptyString(body.password)) {
     return "Plase enter your password";
   }
 
@@ -15,7 +23,7 @@ function checkLogin(body) {
 }
 
 function checkRegister(body) {
-  if(body.username === "") {
+  if(!isNonEmptyString(body.username)) {
     return "Please enter a valid username";
   }
 
@@ -23,11 +31,11 @@ function checkRegister(body) {
     return "Please enter a valid email address";
   }
 
-  if(body.password === "") {
+  if(!isNonEmptyString(body.password)) {
     return "Please enter a password";
   }
 
-  if(body.confirm_password === "") {
+  if(!isNonEmptyString(body.confirm_password)) {
     return "Please confirm your password";
   }
 
@@ -54,16 +62,28 @@ function checkBook(book) {
 }
 
 function checkSettings(body) {
-  if(body.new_pw === "") {
+  if(!isNonEmptyString(body.new_pw)) {
     return "Please enter a new password";
   }
 
-  if(body.confirm_new_pw === "") {
+  if(!isNonEmptyString(body.confirm_new_pw)) {
     return "Plase confirm your password";
   }
 
   if(body.new_pw !== body.confirm_new_pw) {
     return "New passwords don't match";
+  }
+
+  return true;
+}
+
+function checkFind(q) {
+  if(q.option) {
+    return isOption(q.option) ? true : "Invalid optional search";
+  }
+
+  if(!isNonEmptyString(q.query)) {
+    return "Please enter a valid search string";
   }
 
   return true;
@@ -83,6 +103,10 @@ module.exports = function check_input(type) {
 
       case "search":
         isValid = checkSearch(req.query);
+        break;
+
+      case "find":
+        isValid = checkFind(req.query);
         break;
 
       case "book":

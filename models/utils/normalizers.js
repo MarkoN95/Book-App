@@ -20,13 +20,20 @@ function normalizeTrades(user) {
   return { trades: trades };
 }
 
-function normalizePublic(user) {
+function normalizePublic(user, opt = {}) {
   const method = user.login_method;
-  return {
+
+  const publicUser = {
     username: user[method].username,
     image_url: user[method].image_url,
     public: user.public
   };
+
+  if(opt.id === true) {
+    publicUser.id = user._id;
+  }
+
+  return publicUser;
 }
 
 function normalizeOwnLibrary(user) {
@@ -53,20 +60,23 @@ const user_normalizers = {
 
 const book_normalizers = {
   "default": function(book) {
-    return Object.assign({}, book, {
-      owner: normalizePublic(book.owner) //make sh different to pass user id as well
+    const norm = Object.assign({}, book.toObject(), {
+      owner: normalizePublic(book.owner, { id: true }),
+      id: book._id
     });
+
+    delete norm._id;
+
+    return norm;
   },
   ownLibrary: function(book) {
-    return {
-      id: book._id,
-      title: book.title,
-      author: book.author,
-      thumbnail_url: book.thumbnail_url,
-      hasImage: book.hasImage,
-      available: book.available,
-      createdAt: book.createdAt
-    };
+    const norm = Object.assign({}, book.toObject(), {
+      id: book._id
+    });
+
+    delete norm._id;
+
+    return norm;
   }
 };
 

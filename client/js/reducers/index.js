@@ -10,7 +10,8 @@ const {
   BOOK_ADD_REQUEST,
   ADD_BOOK,
   BOOK_REMOVE_REQUEST,
-  REMOVE_BOOK
+  REMOVE_BOOK,
+  MARKETPLACE_SEARCH_REQUEST
 } = require("../actions/types");
 
 const login             = createFormReducer("login");
@@ -22,6 +23,11 @@ const logoutRequest     = createRequestReducer(LOGOUT_REQUEST);
 const bookSearch        = createFormReducer("bookSearch");
 const bookSearchRequest = createRequestReducer(BOOK_SEARCH_REQUEST);
 const settings          = require("./settings");
+
+const marketplace = composeReducers({
+  search: createFormReducer("search"),
+  request: createRequestReducer(MARKETPLACE_SEARCH_REQUEST)
+});
 
 const addBook = composeReducers({
   id: function(state, action) {
@@ -50,6 +56,7 @@ const removeBook = composeReducers({
 });
 
 module.exports = composeReducers({
+  marketplace,
   login,
   loginRequest,
   register,

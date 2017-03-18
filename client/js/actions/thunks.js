@@ -18,7 +18,8 @@ const {
   BOOK_REMOVE_REQUEST,
   UPDATE_PUBLIC_REQUEST,
   CHANGE_PW_REQUEST,
-  DELETE_ACCOUNT_REQUEST
+  DELETE_ACCOUNT_REQUEST,
+  MARKETPLACE_SEARCH_REQUEST
 } = require("./types");
 
 const formatError = require("../utils/format_error");
@@ -67,7 +68,11 @@ function ajaxRequest({ dispatch, type, verb, url, body, onSuccess, final, finalF
     let formattedError = formatError(err, type);
     dispatch(request(type, "fail", formattedError));
 
-    setTimeout(function() {
+    if(this.timeout) {
+      clearTimeout(this.timeout);
+    }
+
+    this.timeout = setTimeout(function() {
       dispatch(request(type, "clear-error"));
     }, clearError || 5000);
 
@@ -121,6 +126,8 @@ module.exports = {
     };
   },
   logout: function(ownProps) {
+    var thunks = this;
+
     return function(dispatch) {
       ajaxRequest({
         dispatch,
@@ -133,7 +140,24 @@ module.exports = {
         },
         final: function() {
           ownProps.router.push("/login");
+
+          dispatch(thunks.purgeAjaxResult("searchBooks"));
+          dispatch(thunks.purgeAjaxResult("marketplace"));
+          dispatch(thunks.purgeForm("search"));
+          dispatch(thunks.purgeForm("bookSearch"));
         }
+      });
+    };
+  },
+  findBooks: function(option) {
+    return function(dispatch, getState) {
+      const query = getState().marketplace.search.query;
+      ajaxRequest({
+        dispatch,
+        type: MARKETPLACE_SEARCH_REQUEST,
+        verb: "get",
+        url: "/api/books/find?" + (option ? "option=" + option : "query=" + query),
+        passData: true
       });
     };
   },
@@ -235,10 +259,20 @@ module.exports = {
       });
     };
   },
+  purgeAjaxResult: function(type) {
+    return function(dispatch) {
+      const map = {
+        marketplace: MARKETPLACE_SEARCH_REQUEST,
+        searchBooks: BOOK_SEARCH_REQUEST
+      };
+      dispatch(request(map[type], "done", null, null));
+    };
+  },
   purgeForm: function(form) {
     return function(dispatch) {
 
       const formFields = {
+        search: ["query"],
         login: ["username", "password"],
         register: ["username", "email", "password", "confirm_password", "full_name", "city", "state"],
         bookSearch: ["query"],

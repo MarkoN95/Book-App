@@ -12,8 +12,16 @@ router.get("/api/books/search", check_input("search"), (req, res) => {
   googleBooks(req.query).pipe(res);
 });
 
-router.get("/api/books/find", (req, res) => {
-  //find books from the marketplace here
+router.get("/api/books/find", check_input("find"), (req, res) => {
+  Book.searchMarketplace(req.query, (err, books) => {
+    if(err) {
+      return res.status(err.status || 500).send(err);
+    }
+    res.json({ items: books.map((book) => {
+      return book.normalize();
+    })
+    });
+  });
 });
 
 router.post("/api/books/add", ensureAuth, check_input("book"), (req, res) => {

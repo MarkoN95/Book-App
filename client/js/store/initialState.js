@@ -8,6 +8,12 @@ function createRequest() {
 }
 
 module.exports = {
+  marketplace: {
+    search: {
+      query: ""
+    },
+    request: createRequest()
+  },
   login: {
     username: "",
     password: ""
