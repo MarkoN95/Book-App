@@ -102,13 +102,24 @@ const localAuthPlugin = function(schema, opt) {
       user = new this(user);
     }
 
-    this.findOne({ [usernameField]: user.get(usernameField) }, (err, existingUser) => {
+    const checkUsername = { [usernameField]: user.get(usernameField) };
+    const checkEmail = user.get("login_method") === "local" ? { "local.email": user.get("local.email") } : false;
+    let query = checkUsername;
+
+    if(checkEmail) {
+      query = { $or: [checkUsername, checkEmail] };
+    }
+
+    this.findOne(query, (err, existingUser) => {
       if(err) {
         return cb(err);
       }
 
       if(existingUser) {
-        return cb(errors.existingUserError());
+        if(existingUser.get(usernameField) === user.get(usernameField)) {
+          return cb(errors.existingUserError(400,"This username is already taken"));
+        }
+        return cb(errors.existingUserError(400, "This email address is already taken"));
       }
 
       user.setPassword(password, (err, user) => {
