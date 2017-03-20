@@ -27,6 +27,10 @@ const autoPopulateOwner = function(next) {
   next();
 };
 
+Book.statics.findAndModify = function(query, sort, doc, options, cb) {
+  return this.collection.findAndModify(query, sort, doc, options, cb);
+};
+
 Book.statics.addBook = function(owner, book, cb) {
   if(!(book instanceof this)) {
     book = new this(book);

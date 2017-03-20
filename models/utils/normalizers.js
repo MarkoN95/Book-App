@@ -55,6 +55,12 @@ const user_normalizers = {
   },
   profile: function(user) {
     return normalizePublic(user);
+  },
+  trade: function(user) {
+    return Object.assign({},
+      normalizePublic(user, { id: true }),
+      normalizeOwnLibrary(user)
+    );
   }
 };
 
@@ -66,6 +72,7 @@ const book_normalizers = {
     });
 
     delete norm._id;
+    delete norm.__v;
 
     return norm;
   },
@@ -75,6 +82,7 @@ const book_normalizers = {
     });
 
     delete norm._id;
+    delete norm.__v;
 
     return norm;
   }

@@ -54,5 +54,29 @@ module.exports = {
       },
       status: status || 400
     };
+  },
+  tradeNotFoundError: function(status, msg) {
+    return {
+      error: {
+        message: msg || "Trade not found",
+        status: status || 400
+      }
+    };
+  },
+  addedUnavaliableBooksError: function(status, msg) {
+    return {
+      error: {
+        message: msg || "you tried to add a book to a trade that is unavailable",
+        status: status || 400
+      }
+    };
+  },
+  wrongTradeAcceptError: function(status, msg) {
+    return {
+      error: {
+        message: msg || "you can't accept a trade when you are not the acceptand",
+        status: status || 400
+      }
+    };
   }
 };
