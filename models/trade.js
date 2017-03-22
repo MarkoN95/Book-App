@@ -138,11 +138,11 @@ Trade.statics.accept = function(tradeId, acceptandId, cb) {
  * Description: declines a trade
  *
  * tradeId:     objectId of tradeId
- * decliner:    objectId of decliner
+ * declinerId:  objectId of decliner
  * cb:          callback with signature callback(err) err can be internal or trade not found
  *
  */
-Trade.statics.decline = function(tradeId, decliner, cb) {
+Trade.statics.decline = function(tradeId, declinerId, cb) {
   this.findOne(
     { _id: tradeId },
     (err, trade) => {
@@ -188,16 +188,16 @@ Trade.statics.decline = function(tradeId, decliner, cb) {
 };
 
 /*
- * Description: negotiates a trade. It effectively updates the stagina area of both parties
- *              it frees all books that are no longer in the staging area and reserves all books that got added to it
- *              the magic happens in the diff() function
+ * Description:  negotiates a trade. It effectively updates the stagina area of both parties
+ *               it frees all books that are no longer in the staging area and reserves all books that got added to it
+ *               the magic happens in the diff() function
  *
- * negotiator: id of the person who wants to negotiate
- * tradeId:    id of trade
- * nextStages: an object with properties "initiand" and "acceptand" that contains the next stages
- * cb:         callback function with signature callback(err). error can be internal or trade not found
+ * negotiatorId: id of the person who wants to negotiate
+ * tradeId:      id of trade
+ * nextStages:   an object with properties "initiand" and "acceptand" that contains the next stages
+ * cb:           callback function with signature callback(err). error can be internal or trade not found
  */
-Trade.statics.negotiate = function(negotiator, tradeId, nextStages, cb) {
+Trade.statics.negotiate = function(tradeId, negotiatorId, nextStages, cb) {
   this.findOne(
     { _id: tradeId },
     (err, trade) => {
@@ -238,7 +238,7 @@ Trade.statics.negotiate = function(negotiator, tradeId, nextStages, cb) {
 
               trade.state = {
                 type: "negotiate",
-                by: negotiator
+                by: negotiatorId
               };
 
               trade.save((err) => {

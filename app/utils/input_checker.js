@@ -1,3 +1,7 @@
+function isObjectId(id) {
+  return /^[0-9a-fA-F]{24}$/.test(id);
+}
+
 function isEmail(str) {
   return /[^\s@]+@[^\s@]+\.[^\s@]+/.test(str);
 }
@@ -89,6 +93,74 @@ function checkFind(q) {
   return true;
 }
 
+function stageHasError(body) {
+  if(body.nextStages) {
+    return stageHasError({ stages: body.nextStages });
+  }
+
+  let stages = Object.keys(body.stages);
+  let check = ["initiand", "acceptand"];
+  var error = false;
+
+  if(stages.length === 0) {
+    return true;
+  }
+
+  stages.forEach((stage) => {
+    if(check.indexOf(stage) === -1) {
+      error = true;
+    }
+    if(Array.isArray(body.stages[stage])) {
+      error = true;
+    }
+    body.stages[stage].forEach(id => error = !isObjectId(id) ? true : error);
+  });
+
+  return error;
+}
+
+const trade = {
+  initiate: function(body) {
+    let parties = Object.keys(body.parties);
+    let check = ["initiand", "acceptand"];
+    var error = false;
+    parties.forEach((party) => {
+      if(check.indexOf(party) === -1) {
+        error = true;
+      }
+      if(!isObjectId(body.parties[party])) {
+        error = true;
+      }
+    });
+    error = stageHasError(body);
+    if(error) {
+      return "invalid payload";
+    }
+    return true;
+  },
+  accept: function(body) {
+    if(!isObjectId(body.tradeId) || !isObjectId(body.acceptandId)) {
+      return "invalid payload";
+    }
+    return true;
+  },
+  decline: function(body) {
+    if(!isObjectId(body.tradeId) || !isObjectId(body.declinerId)) {
+      return "invalid payload";
+    }
+    return true;
+  },
+  negotiate: function(body) {
+    if(!isObjectId(body.negotiatorId) || !isObjectId(body.tradeId)) {
+      return "invalid payload";
+    }
+    if(stageHasError(body)) {
+      return "invalid payload";
+    }
+    return true;
+  }
+};
+
 module.exports = function check_input(type) {
   return function(req, res, next) {
     let isValid;
@@ -117,6 +189,22 @@ module.exports = function check_input(type) {
         isValid = checkSettings(req.body);
         break;
 
+      case "trade_initiate":
+        isValid = trade.initiate(req.body);
+        break;
+
+      case "trade_accept":
+        isValid = trade.accept(req.body);
+        break;
+
+      case "trade_decline":
+        isValid = trade.decline(req.body);
+        break;
+
+      case "trade_negotiate":
+        isValid = trade.negotiate(req.body);
+        break;
+
       default:
         if(process.env.NODE_ENV !== "production") {
           console.log("Attention! check_input() default case triggerd!");
@@ -124,7 +212,7 @@ module.exports = function check_input(type) {
         return next();
     }
 
-    if(isValid === true) {
+    if(isValid) {
       return next();
     }
 
