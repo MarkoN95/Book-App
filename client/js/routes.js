@@ -8,6 +8,7 @@ const Login = require("./components/Login");
 const Register = require("./components/Register");
 const User = require("./components/User");
 const Settings = require("./components/Settings");
+const Trade = require("./components/Trade");
 
 const { purgeForm, populatePublicInfoForm } = require("./actions/thunks");
 const composeSync = require("./utils/compose_hooks");
@@ -40,6 +41,14 @@ const routes = function(store) {
       <Route
         path="/marketplace"
         component={Marketplace}
+      />
+      <Route
+        path="/trade/new"
+        component={Trade}
+      />
+      <Route
+        path="/trade"
+        component={Trade}
       />
       <Route
         path="/login"

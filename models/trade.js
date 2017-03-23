@@ -25,6 +25,21 @@ Trade.statics.findAndModify = function(query, sort, doc, options, cb) {
   return this.collection.findAndModify(query, sort, doc, options, cb);
 };
 
+// example req.body
+
+/*
+  {
+    parites: {
+      initiand: 12345678,
+      acceptand: 87654321,
+    },
+    stages: {
+      initiand: [1234, 2345, 3456],
+      acceptand: [8765, 7654, 6543]
+    }
+  }
+*/
+
 /*
  * Description: Creates a new Trade
  *
@@ -84,6 +99,15 @@ Trade.statics.initiate = function(parties, stages, cb) {
 
 };
 
+// example req.body
+
+/*
+  {
+    tradeId: 1234,
+    acceptandId: 4321
+  }
+*/
+
 /*
  * Description: accepts a trade
  *
@@ -133,6 +157,15 @@ Trade.statics.accept = function(tradeId, acceptandId, cb) {
     }
   );
 };
+
+// example req.body
+
+/*
+  {
+    tradeId: 1234,
+    declinerId: 4321
+  }
+*/
 
 /*
  * Description: declines a trade
@@ -186,6 +219,19 @@ Trade.statics.decline = function(tradeId, declinerId, cb) {
     }
   );
 };
+
+// example req.body
+
+/*
+  {
+    tradeId: 1234,
+    negotiatorId: 4321,
+    nextStages: {
+      initiand: [1234, 2345, 3456],
+      acceptand: [9876, 8765, 7654]
+    }
+  }
+*/
 
 /*
  * Description:  negotiates a trade. It effectively updates the stagina area of both parties

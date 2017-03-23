@@ -23,6 +23,7 @@ const logoutRequest     = createRequestReducer(LOGOUT_REQUEST);
 const bookSearch        = createFormReducer("bookSearch");
 const bookSearchRequest = createRequestReducer(BOOK_SEARCH_REQUEST);
 const settings          = require("./settings");
+const trade             = require("./trade");
 
 const marketplace = composeReducers({
   search: createFormReducer("search"),
@@ -56,6 +57,7 @@ const removeBook = composeReducers({
 });
 
 module.exports = composeReducers({
+  trade,
   marketplace,
   login,
   loginRequest,

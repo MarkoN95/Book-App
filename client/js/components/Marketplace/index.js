@@ -18,10 +18,11 @@ const Marketplace = React.createClass({
     }),
     update: func.isRequired,
     searchMarketplace: func.isRequired,
-    searchWithOption: func.isRequired
+    searchWithOption: func.isRequired,
+    initiateTrade: func.isRequired
   },
   render: function() {
-    let { query, request, update, searchMarketplace, searchWithOption } = this.props;
+    let { query, request, update, searchMarketplace, searchWithOption, initiateTrade } = this.props;
     return (
       <Grid  className="mainGrid" fluid>
         <Row>
@@ -73,7 +74,14 @@ const Marketplace = React.createClass({
               request.data.items &&
               request.data.items.map((book) => {
                 return(
-                  <Book key={book.id} data={book} type="trade" action={(book) => { console.log(book); }}/>
+                  <Book
+                    //renderActionAsLink
+                    //to="/trade/new"
+                    key={book.id}
+                    data={book}
+                    type="trade"
+                    action={initiateTrade}
+                  />
                 );
               })
             }
@@ -97,7 +105,7 @@ const mapStateToProps = function(state) {
   };
 };
 
-const mapDispatchToProps = function(dispatch) {
+const mapDispatchToProps = function(dispatch, ownProps) {
   return {
     update: function(e) {
       dispatch(actions.updateFormInput("search", e.target.name, e.target.value));
@@ -108,6 +116,9 @@ const mapDispatchToProps = function(dispatch) {
     },
     searchWithOption: function(eventKey) {
       dispatch(thunks.findBooks(eventKey));
+    },
+    initiateTrade: function(book) {
+      dispatch(thunks.loadTradeUI({ new: true }, book.owner, book, ownProps));
     }
   };
 };

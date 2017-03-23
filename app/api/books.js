@@ -62,6 +62,15 @@ router.delete("/api/books/remove", ensureAuth, (req, res) => {
   });
 });
 
+router.get("/api/books/getLibrary", ensureAuth, (req, res) => {
+  Book.getLibraryByOwnerId(req.query.ownerId, (err, library) => {
+    if(err) {
+      return res.status(err.status || 500).send(err);
+    }
+    res.json(library);
+  });
+});
+
 module.exports = function() {
   return router;
 };

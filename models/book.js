@@ -116,6 +116,19 @@ Book.statics.searchMarketplace = function(q, cb) {
   }
 };
 
+Book.statics.getLibraryByOwnerId = function(ownerId, cb) {
+  if(!checker.objectId(ownerId)) {
+    return cb(errors.invalidObjectIdError());
+  }
+
+  this.find({ owner: ownerId }, (err, library) => {
+    if(err) {
+      return cb(err);
+    }
+    cb(null, library.map(book => book.normalize()));
+  });
+};
+
 Book.pre("find", autoPopulateOwner);
 
 Book.plugin(normalizerPlugin, {

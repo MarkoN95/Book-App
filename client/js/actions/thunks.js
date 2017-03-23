@@ -1,3 +1,4 @@
+const clone = require("../utils/deepcopy");
 const axios = require("axios");
 const {
   request,
@@ -6,8 +7,16 @@ const {
   removeFromLibrary,
   updatePublicInfo,
   toggleModal,
-  updateFormInput
-} = Object.assign({}, require("./request"), require("./user"), require("./update"));
+  updateFormInput,
+  load,
+  addToStage
+} = Object.assign(
+  {},
+  require("./request"),
+  require("./user"),
+  require("./update"),
+  require("./trade")
+);
 
 const {
   REGISTER_REQUEST,
@@ -19,7 +28,8 @@ const {
   UPDATE_PUBLIC_REQUEST,
   CHANGE_PW_REQUEST,
   DELETE_ACCOUNT_REQUEST,
-  MARKETPLACE_SEARCH_REQUEST
+  MARKETPLACE_SEARCH_REQUEST,
+  GET_OTHER_LIBRARAY_REQUEST
 } = require("./types");
 
 const formatError = require("../utils/format_error");
@@ -65,8 +75,8 @@ function ajaxRequest({ dispatch, type, verb, url, body, onSuccess, final, finalF
     }
   })
   .catch((err) => {
-    let formattedError = formatError(err, type);
-    dispatch(request(type, "fail", formattedError));
+    let displayError = formatError(err, type);
+    dispatch(request(type, "fail", displayError));
 
     if(this.timeout) {
       clearTimeout(this.timeout);
@@ -77,7 +87,7 @@ function ajaxRequest({ dispatch, type, verb, url, body, onSuccess, final, finalF
     }, clearError || 5000);
 
     if(process.env.NODE_ENV !== "production") {
-      if(formatError.throw) {
+      if(displayError.throw) {
         throw err;
       }
     }
@@ -298,6 +308,63 @@ module.exports = {
       dispatch(updateFormInput("public_info", "full_name", _public.full_name));
       dispatch(updateFormInput("public_info", "city", _public.city));
       dispatch(updateFormInput("public_info", "state", _public.state));
+    };
+  },
+  loadTradeUI: function(tradeType, initialOther, initialBook, ownProps) {
+    return function(dispatch, getState) {
+      const user = getState().user;
+
+      if(!user) {
+        ownProps.router.push("/login");
+        return;
+      }
+
+      const self_library = clone(user.library);
+      const self = {
+        id: user.id,
+        username: user.username,
+        image_url: user.image_url
+      };
+      const other = {
+        id: initialOther.id,
+        username: initialOther.username,
+        image_url: initialOther.image_url
+      };
+
+      dispatch(load("self_library", self_library));
+      dispatch(load("self", self));
+      dispatch(load("other", other));
+
+      if(tradeType.id) {
+        dispatch(load("id", tradeType.id));
+      }
+
+      if(tradeType.id) {
+        ownProps.router.push({
+          pathname: "/trade",
+          query: {
+            id: tradeType.id
+          }
+        });
+      }
+      else if(tradeType.new) {
+        ownProps.router.push("/trade/new");
+      }
+
+      ajaxRequest({
+        dispatch,
+        type: GET_OTHER_LIBRARAY_REQUEST,
+        verb: "get",
+        url: "/api/books/getLibrary?ownerId=" + initialOther.id,
+        onSuccess: function(res) {
+          dispatch(load("other_library", res.data));
+        },
+        final: function() {
+          if(initialBook) {
+            dispatch(addToStage("other", initialBook));
+          }
+        }
+      });
     };
   }
 };

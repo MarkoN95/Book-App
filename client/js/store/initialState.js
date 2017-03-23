@@ -8,6 +8,16 @@ function createRequest() {
 }
 
 module.exports = {
+  trade: {
+    id: null, // no id when generating  new trade
+    self: null,
+    other: null,
+    self_library: [],
+    other_library: [],
+    self_stage: [],
+    other_stage: [],
+    request_other_libraray: createRequest()
+  },
   marketplace: {
     search: {
       query: ""
