@@ -4,3 +4,4 @@ build
 DB
 tests
 *.log
+*.log.*
