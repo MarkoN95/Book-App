@@ -13,7 +13,8 @@ const Book = React.createClass({
     type: string.isRequired,
     action: func.isRequired,
     renderActionAsLink : bool,
-    to: string
+    to: string,
+    format: bool
   },
   getInitialState: function() {
     return {
@@ -46,8 +47,8 @@ const Book = React.createClass({
     return isVowel ? word.substr(0, word.length - 2) + "ing..." : word + "ing...";
   },
   actionButton: function() {
-    let { success, pending, type, data } = this.props;
-    let book = type === "add" ? this.formatBook(data) : data;
+    let { success, pending, type, data, format } = this.props;
+    let book = format ? this.formatBook(data) : data;
     return(
       <Button
         className="btnInverse edge"
@@ -64,12 +65,12 @@ const Book = React.createClass({
     );
   },
   render: function() {
-    let { type, data, renderActionAsLink, to } = this.props;
+    let { data, renderActionAsLink, to, format } = this.props;
     let { mouseOver } = this.state;
     let { cover, coverInfo, show, blur } = styles;
 
     //format only necessary when they come raw from the api and not from the own server
-    let book = type === "add" ? this.formatBook(data) : data;
+    let book = format ? this.formatBook(data) : data;
     return(
       <div className={styles.book}>
         <div

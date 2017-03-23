@@ -45,7 +45,7 @@ function normalizeOwnLibrary(user) {
 const user_normalizers = {
   ownProfile: function(user) {
     return Object.assign({},
-       normalizePublic(user),
+       normalizePublic(user, { id: true }),
        normalizeOwnLibrary(user),
        normalizeTrades(user),
       {

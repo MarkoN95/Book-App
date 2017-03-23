@@ -1,0 +1,9 @@
+.stage {
+  height: 200px;
+  overflow-y: auto;
+}
+
+.library {
+  overflow-x: auto;
+  white-space: nowrap;
+}

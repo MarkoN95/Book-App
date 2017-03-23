@@ -29,7 +29,8 @@ const {
   CHANGE_PW_REQUEST,
   DELETE_ACCOUNT_REQUEST,
   MARKETPLACE_SEARCH_REQUEST,
-  GET_OTHER_LIBRARAY_REQUEST
+  GET_OTHER_LIBRARAY_REQUEST,
+  TRADE_REQUEST
 } = require("./types");
 
 const formatError = require("../utils/format_error");
@@ -365,6 +366,48 @@ module.exports = {
           }
         }
       });
+    };
+  },
+  initiateTrade: function() {
+    return function(dispatch, getState) {
+      const trade = getState().trade;
+
+      const payload = {
+        parties: {
+          initiand: trade.self.id,
+          acceptand: trade.other.id
+        },
+        stages: {
+          initiand: trade.self_stage.map(b => b.id),
+          acceptand: trade.other_stage.map(b => b.id)
+        }
+      };
+
+      ajaxRequest({
+        dispatch,
+        type: TRADE_REQUEST,
+        verb: "post",
+        url: "/api/trade/initiate",
+        body: payload,
+        onSuccess: function(res) {
+          console.log("success initiate\n", res);
+        }
+      });
+    };
+  },
+  acceptTrade: function() {
+    return function(dispatch, getState) {
+
+    };
+  },
+  declineTrade: function() {
+    return function(dispatch, getState) {
+
+    };
+  },
+  negotiateTrade: function() {
+    return function(dispatch, getState) {
+
     };
   }
 };

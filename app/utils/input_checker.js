@@ -102,7 +102,7 @@ function stageHasError(body) {
   let check = ["initiand", "acceptand"];
   var error = false;
 
-  if(stages.length === 0) {
+  if(stages.length !== 2) {
     return true;
   }
 
@@ -110,7 +110,7 @@ function stageHasError(body) {
     if(check.indexOf(stage) === -1) {
       error = true;
     }
-    if(Array.isArray(body.stages[stage])) {
+    if(!Array.isArray(body.stages[stage])) {
       error = true;
     }
     body.stages[stage].forEach(id => error = !isObjectId(id) ? true : error);
@@ -124,6 +124,7 @@ const trade = {
     let parties = Object.keys(body.parties);
     let check = ["initiand", "acceptand"];
     var error = false;
+
     parties.forEach((party) => {
       if(check.indexOf(party) === -1) {
         error = true;
@@ -132,10 +133,17 @@ const trade = {
         error = true;
       }
     });
+
     error = stageHasError(body);
+
     if(error) {
       return "invalid payload";
     }
+
+    if(body.parties.initiand === body.parties.acceptand) {
+      return "You can't start a trade with yourself";
+    }
+
     return true;
   },
   accept: function(body) {
@@ -212,7 +220,7 @@ module.exports = function check_input(type) {
         return next();
     }
 
-    if(isValid) {
+    if(isValid === true) {
       return next();
     }
 

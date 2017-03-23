@@ -16,7 +16,8 @@ module.exports = {
     other_library: [],
     self_stage: [],
     other_stage: [],
-    request_other_libraray: createRequest()
+    request_other_libraray: createRequest(),
+    trade_request: createRequest()
   },
   marketplace: {
     search: {

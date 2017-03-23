@@ -159,6 +159,7 @@ const User = React.createClass({
                             key={book.id}
                             data={book}
                             type="add"
+                            format
                             action={addBook}/>
                         );
                       })
