@@ -98,52 +98,30 @@ function stageHasError(body) {
     return stageHasError({ stages: body.nextStages });
   }
 
-  let stages = Object.keys(body.stages);
-  let check = ["initiand", "acceptand"];
-  var error = false;
-
-  if(stages.length !== 2) {
+  if(!body.stages.initiand || !body.stages.acceptand) {
     return true;
   }
 
-  stages.forEach((stage) => {
-    if(check.indexOf(stage) === -1) {
-      error = true;
-    }
-    if(!Array.isArray(body.stages[stage])) {
-      error = true;
-    }
-    body.stages[stage].forEach(id => error = !isObjectId(id) ? true : error);
-  });
+  var error = false;
+  
+  let lookForObjectId = (id) => {
+    error = !isObjectId(id) ? true : error;
+  };
+
+  body.stages.initiand.forEach(lookForObjectId);
+  body.stages.acceptand.forEach(lookForObjectId);
 
   return error;
 }
 
 const trade = {
   initiate: function(body) {
-    let parties = Object.keys(body.parties);
-    let check = ["initiand", "acceptand"];
-    var error = false;
-
-    parties.forEach((party) => {
-      if(check.indexOf(party) === -1) {
-        error = true;
-      }
-      if(!isObjectId(body.parties[party])) {
-        error = true;
-      }
-    });
-
-    error = stageHasError(body);
-
-    if(error) {
+    if(!isObjectId(body.parties && body.parties.initiand) || !isObjectId(body.parties && body.parties.acceptand) || stageHasError(body)) {
       return "invalid payload";
     }
-
     if(body.parties.initiand === body.parties.acceptand) {
       return "You can't start a trade with yourself";
     }
-
     return true;
   },
   accept: function(body) {
