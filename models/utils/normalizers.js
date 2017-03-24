@@ -3,17 +3,20 @@ function normalizeTrades(user) {
     const ilm = trade.initiand.login_method;
     const alm = trade.acceptand.login_method;
     return {
+      id: trade._id,
       initiand: {
         id: trade.initiand._id,
         username: trade.initiand[ilm].username,
-        image_url: trade.initiated[ilm].image_url
+        image_url: trade.initiand[ilm].image_url
       },
       acceptand: {
         id: trade.acceptand._id,
         username: trade.acceptand[alm].username,
         image_url: trade.acceptand[alm].image_url
-      }
-      //don't forget to add the stageing areas etc.
+      },
+      initiand_stage: trade.initiand_stage,
+      acceptand_stage: trade.acceptand_stage,
+      state: trade.state
     };
   });
 
@@ -88,7 +91,14 @@ const book_normalizers = {
   }
 };
 
+const trade_normalzers = {
+  "default": function(trade) {
+    return normalizeTrades({ trades: [trade] }).trades[0];
+  }
+};
+
 module.exports = {
   user: user_normalizers,
-  book: book_normalizers
+  book: book_normalizers,
+  trade: trade_normalzers
 };

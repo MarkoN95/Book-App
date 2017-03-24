@@ -10,6 +10,37 @@ const actions = Object.assign({}, require("../../actions/update"), require("../.
 const styles = require("./styles.css");
 const Book = require("../Book");
 
+const Trade = function(props) {
+  return(
+    <div className={styles.tradeLink}>
+      <div>
+        <Image
+          src={props.data.acceptand.image_url}
+          className={styles.tradeImage}
+          responsive
+          circle
+        />
+        <span className={styles.tradePartner}>
+          {
+            props.data.initiand.id !== props.selfId ?
+            props.data.initiand.username :
+            props.data.acceptand.username
+          }
+        </span>
+      </div>
+      <Button className="btnInverse pull-right" onClick={props.action.bind(this, props.data, props.selfId)}>
+        View
+      </Button>
+    </div>
+  );
+};
+
+Trade.propTypes = {
+  selfId: string.isRequired,
+  data: object.isRequired,
+  action: func.isRequired
+};
+
 const User = React.createClass({
   propTypes: {
     user: object,
@@ -18,6 +49,7 @@ const User = React.createClass({
     submitSearch: func.isRequired,
     addBook: func.isRequired,
     removeBook: func.isRequired,
+    openTrade: func.isRequired,
     bookSearch: shape({
       isPending: bool.isRequired,
       success: bool,
@@ -44,7 +76,7 @@ const User = React.createClass({
     })
   },
   render: function() {
-    let { user, bookSearch, bookAdd, bookRemove, submitSearch, search, update, addBook, removeBook } = this.props;
+    let { user, bookSearch, bookAdd, bookRemove, submitSearch, search, update, addBook, removeBook, openTrade } = this.props;
 
     return(
       <Grid className="mainGrid" fluid>
@@ -105,7 +137,17 @@ const User = React.createClass({
                   }
                 </Tab>
                 <Tab eventKey={2} title="Trades">
-                  Active Trades here
+                  {
+                    user.trades.length === 0 ?
+                    <p className={"text-center " + styles.noTrades}>
+                      You have no active trades
+                    </p> :
+                    user.trades.map((trade) => {
+                      return(
+                        <Trade data={trade} selfId={user.id} action={openTrade}/>
+                      );
+                    })
+                  }
                 </Tab>
                 <Tab eventKey={3} title="Add a Book">
                   <Row>
@@ -186,7 +228,7 @@ const mapStateToProps = function(state) {
   };
 };
 
-const mapDispatchToProps = function(dispatch) {
+const mapDispatchToProps = function(dispatch, ownProps) {
   return {
     update: function(e) {
       dispatch(actions.updateFormInput("bookSearch", e.target.name, e.target.value));
@@ -202,6 +244,16 @@ const mapDispatchToProps = function(dispatch) {
     removeBook: function(book) {
       dispatch(actions.selectBookId(types.REMOVE_BOOK, book.id));
       dispatch(thunks.removeBook(book));
+    },
+    openTrade: function(trade, selfId) {
+      let initialOther = trade.initiand.id !== selfId ?
+      Object.assign({}, trade.initiand, {
+        role: "initiand"
+      }) :
+      Object.assign({}, trade.acceptand, {
+        role: "acceptand"
+      });
+      dispatch(thunks.loadTradeUI(trade, initialOther, null, ownProps));
     }
   };
 };

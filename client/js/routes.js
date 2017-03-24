@@ -10,7 +10,7 @@ const User = require("./components/User");
 const Settings = require("./components/Settings");
 const Trade = require("./components/Trade");
 
-const { purgeForm, populatePublicInfoForm } = require("./actions/thunks");
+const { purgeForm, populatePublicInfoForm, purgeTradeUI } = require("./actions/thunks");
 const composeSync = require("./utils/compose_hooks");
 
 const routes = function(store) {
@@ -29,6 +29,10 @@ const routes = function(store) {
     };
   };
 
+  const clearTradeUI = function() {
+    store.dispatch(purgeTradeUI());
+  };
+
   const requireAuth = (nextState, replaceState) => {
     if(!store.getState().user) {
       replaceState({ pathname: "/login" });
@@ -45,10 +49,12 @@ const routes = function(store) {
       <Route
         path="/trade/new"
         component={Trade}
+        onLeave={clearTradeUI}
       />
       <Route
         path="/trade"
         component={Trade}
+        onLeave={clearTradeUI}
       />
       <Route
         path="/login"

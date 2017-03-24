@@ -4,7 +4,7 @@ const { Grid, Row, Col, Button } = require("react-bootstrap");
 const { object, func } = React.PropTypes;
 const Book = require("../Book");
 
-const actions = require("../../actions/trade");
+const actions = Object.assign({}, require("../../actions/trade"), require("../../actions/user"));
 const thunks = require("../../actions/thunks");
 const styles = require("./styles.css");
 
@@ -121,7 +121,7 @@ const mapStateToProps = function(state) {
   };
 };
 
-const mapDispatchToProps = function(dispatch) {
+const mapDispatchToProps = function(dispatch, ownProps) {
   return {
     addToSelfStage: function(book) {
       dispatch(actions.addToStage("self", book));
@@ -136,16 +136,16 @@ const mapDispatchToProps = function(dispatch) {
       dispatch(actions.removeFromStage("other", book));
     },
     initiateTrade: function() {
-      dispatch(thunks.initiateTrade());
+      dispatch(thunks.initiateTrade(ownProps));
     },
     acceptTrade: function() {
-      dispatch(thunks.acceptTrade());
+      dispatch(thunks.acceptTrade(ownProps));
     },
     declineTrade: function() {
-      dispatch(thunks.declineTrade());
+      dispatch(thunks.declineTrade(ownProps));
     },
     negotiateTrade: function() {
-      dispatch(thunks.negotiateTrade());
+      dispatch(thunks.negotiateTrade(ownProps));
     }
   };
 };

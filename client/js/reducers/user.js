@@ -20,6 +20,33 @@ const user = function(state, action) {
         public: action.info
       });
 
+    case types.ADD_TRADE:
+      return Object.assign({}, state, {
+        trades: state.trades.concat([action.trade])
+      });
+
+    case types.DELETE_TRADE:
+      return Object.assign({}, state, {
+        trades: state.trades.filter(t => t.id !== action.tradeId)
+      });
+
+    case types.REPLACE_TRADE:
+      return Object.assign({}, state, {
+        trades: state.trades.map(t => t.id !== action.trade.id ? t : action.trade)
+      });
+
+    case types.SET_BOOKS:
+      return Object.assign({}, state, {
+        library: state.library.map((book) => {
+          if(action.bookIds.indexOf(book.id) !== -1) {
+            return Object.assign({}, book, {
+              available: action.status
+            });
+          }
+          return book;
+        })
+      });
+
     default:
       return state;
   }

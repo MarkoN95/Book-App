@@ -103,7 +103,7 @@ function stageHasError(body) {
   }
 
   var error = false;
-  
+
   let lookForObjectId = (id) => {
     error = !isObjectId(id) ? true : error;
   };
@@ -125,19 +125,19 @@ const trade = {
     return true;
   },
   accept: function(body) {
-    if(!isObjectId(body.tradeId) || !isObjectId(body.acceptandId)) {
+    if(!isObjectId(body.tradeId)) {
       return "invalid payload";
     }
     return true;
   },
-  decline: function(body) {
-    if(!isObjectId(body.tradeId) || !isObjectId(body.declinerId)) {
+  decline: function(query) {
+    if(!isObjectId(query.tradeId)) {
       return "invalid payload";
     }
     return true;
   },
   negotiate: function(body) {
-    if(!isObjectId(body.negotiatorId) || !isObjectId(body.tradeId)) {
+    if(!isObjectId(body.tradeId)) {
       return "invalid payload";
     }
     if(stageHasError(body)) {
@@ -184,7 +184,7 @@ module.exports = function check_input(type) {
         break;
 
       case "trade_decline":
-        isValid = trade.decline(req.body);
+        isValid = trade.decline(req.query);
         break;
 
       case "trade_negotiate":

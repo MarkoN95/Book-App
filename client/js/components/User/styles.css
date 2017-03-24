@@ -11,6 +11,10 @@
   margin-top: 16px;
 }
 
+.noTrades {
+  margin-top: 16px;
+}
+
 @media(max-width: 768px) {
   .tabsContainer {
     composes: profileContainer;
@@ -37,4 +41,23 @@
 
 .bookSearch {
   margin-top: 16px;
+}
+
+.tradeLink {
+  margin: 8px;
+  padding: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+}
+
+.tradeLink * {
+  display: inline-block;
+}
+
+.tradeImage {
+  height: 50px;
+  width: 50px;
+}
+
+.tradePartner {
+  margin-left: 32px;
 }

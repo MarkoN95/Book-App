@@ -168,14 +168,6 @@ const autoPopulateLibraryAndTrades = function(next) {
         {
           path: "acceptand",
           select: "-library -trades"
-        },
-        {
-          path: "initiand_stage",
-          select: "-owner"
-        },
-        {
-          path: "acceptand_stage",
-          select: "-owner"
         }
       ]
     }

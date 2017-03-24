@@ -9,7 +9,11 @@ const {
   toggleModal,
   updateFormInput,
   load,
-  addToStage
+  addToStage,
+  setBookAvailability,
+  addTrade,
+  deleteTrade,
+  replaceTrade
 } = Object.assign(
   {},
   require("./request"),
@@ -34,6 +38,7 @@ const {
 } = require("./types");
 
 const formatError = require("../utils/format_error");
+const diff = require("../../../models/utils/diff");
 /*
  * makeAjaxRequest() description:
  *
@@ -311,7 +316,7 @@ module.exports = {
       dispatch(updateFormInput("public_info", "state", _public.state));
     };
   },
-  loadTradeUI: function(tradeType, initialOther, initialBook, ownProps) {
+  loadTradeUI: function(trade, initialOther, initialBook, ownProps) {
     return function(dispatch, getState) {
       const user = getState().user;
 
@@ -336,19 +341,16 @@ module.exports = {
       dispatch(load("self", self));
       dispatch(load("other", other));
 
-      if(tradeType.id) {
-        dispatch(load("id", tradeType.id));
-      }
-
-      if(tradeType.id) {
+      if(trade.id) {
+        dispatch(load("id", trade.id));
         ownProps.router.push({
           pathname: "/trade",
           query: {
-            id: tradeType.id
+            id: trade.id
           }
         });
       }
-      else if(tradeType.new) {
+      else if(trade.new) {
         ownProps.router.push("/trade/new");
       }
 
@@ -364,11 +366,47 @@ module.exports = {
           if(initialBook) {
             dispatch(addToStage("other", initialBook));
           }
+
+          if(trade.id) {
+            let loadedTrade = getState().trade;
+            let otherLibrary = loadedTrade.other_library;
+            let selfLibrary = loadedTrade.self_library;
+            let selfRole = initialOther.role === "initiand" ? "acceptand" : "initiand";
+
+            trade[initialOther.role + "_stage"].map((bid) => {
+              let foundBook = otherLibrary.find((book) => {
+                return book.id === bid;
+              });
+              foundBook = Object.assign({}, foundBook, { available: true });
+              dispatch(addToStage("other", foundBook));
+            });
+
+            trade[selfRole + "_stage"].map((bid) => {
+              let foundBook = selfLibrary.find((book) => {
+                return book.id === bid;
+              });
+              foundBook = Object.assign({}, foundBook, { available: true });
+              dispatch(addToStage("self", foundBook));
+            });
+          }
+          dispatch(load("loaded", true));
         }
       });
     };
   },
-  initiateTrade: function() {
+  purgeTradeUI: function() {
+    return function(dispatch) {
+      dispatch(load("id", null));
+      dispatch(load("self", null));
+      dispatch(load("self_library", []));
+      dispatch(load("self_stage", []));
+      dispatch(load("other", null));
+      dispatch(load("other_library", []));
+      dispatch(load("other_stage", []));
+      dispatch(load("loaded", false));
+    };
+  },
+  initiateTrade: function(ownProps) {
     return function(dispatch, getState) {
       const trade = getState().trade;
 
@@ -390,24 +428,103 @@ module.exports = {
         url: "/api/trade/initiate",
         body: payload,
         onSuccess: function(res) {
-          console.log("success initiate\n", res);
+          dispatch(setBookAvailability(payload.stages.initiand, false));
+          dispatch(addTrade(res.data));
+        },
+        final: function() {
+          ownProps.router.push("/user");
         }
       });
     };
   },
-  acceptTrade: function() {
+  acceptTrade: function(ownProps) {
     return function(dispatch, getState) {
+      const state = getState();
 
+      const payload = {
+        tradeId: state.trade.id
+      };
+
+      ajaxRequest({
+        dispatch,
+        type: TRADE_REQUEST,
+        verb: "put",
+        url: "/api/trade/accept",
+        body: payload,
+        onSuccess: function(res) {
+          dispatch(updateUser(res.data));
+        },
+        final: function() {
+          ownProps.router.push("/user");
+        }
+      });
     };
   },
-  declineTrade: function() {
+  declineTrade: function(ownProps) {
     return function(dispatch, getState) {
+      const state = getState();
 
+      const payload = {
+        tradeId: state.trade.id,
+      };
+
+      let trade = state.user.trades.find(t => t.id === state.trade.id);
+      let selfRole = trade.initiand.id === state.user.id ? "initiand" : "acceptand";
+      let booksToFree = trade[selfRole + "_stage"];
+
+      ajaxRequest({
+        dispatch,
+        type: TRADE_REQUEST,
+        verb: "delete",
+        url: "/api/trade/decline?tradeId=" + payload.tradeId,
+        onSuccess: function() {
+          dispatch(setBookAvailability(booksToFree, true));
+          dispatch(deleteTrade(state.trade.id));
+        },
+        final: function() {
+          ownProps.router.push("/user");
+        }
+      });
     };
   },
-  negotiateTrade: function() {
+  negotiateTrade: function(ownProps) {
     return function(dispatch, getState) {
+      const state = getState();
 
+      let trade = state.user.trades.find(t => t.id === state.trade.id);
+      let selfRole = trade.initiand.id === state.user.id ? "initiand" : "acceptand";
+      let otherRole = selfRole === "initiand" ? "acceptand" : "initiand";
+
+      const payload = {
+        tradeId: state.trade.id,
+        nextStages: {
+          [selfRole]: state.trade.self_stage.map(b => b.id),
+          [otherRole]: state.trade.other_stage.map(b => b.id)
+        }
+      };
+
+      let selfDiff = diff(
+        trade[selfRole + "_stage"],
+        state.trade.self_stage.map(b => b.id)
+      );
+
+      ajaxRequest({
+        dispatch,
+        type: TRADE_REQUEST,
+        verb: "put",
+        url: "/api/trade/negotiate",
+        body: payload,
+        onSuccess: function(res) {
+          dispatch(replaceTrade(res.data));
+          // selfDiff.add are books that were added to the stage so available must be set to false
+          // selfDiff.remove are book that were removed from the stage so avaliable must be set to true
+          dispatch(setBookAvailability(selfDiff.add, false));
+          dispatch(setBookAvailability(selfDiff.remove, true));
+        },
+        final: function() {
+          ownProps.router.push("/user");
+        }
+      });
     };
   }
 };

@@ -2,9 +2,20 @@ require("./user");
 require("./book");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Schema.Types.ObjectId;
+const normalizerPlugin = require("./plugins/normalizer");
 
 const errors = require("./utils/errors");
 const diff = require("./utils/diff");
+const checker = require("./utils/checker");
+
+function toObjectId(id) {
+  if(checker.objectId(id)) {
+    return mongoose.Types.ObjectId(id);
+  }
+  if(process.env.NODE_ENV !== "production") {
+    console.log("invalid ObjectID found: ", id);
+  }
+}
 
 const Trade = mongoose.Schema({
   initiand: { type: ObjectId, ref: "user" },
@@ -20,10 +31,6 @@ const Trade = mongoose.Schema({
     default: { type: "initiated", by: "initiand" }
   }
 });
-
-Trade.statics.findAndModify = function(query, sort, doc, options, cb) {
-  return this.collection.findAndModify(query, sort, doc, options, cb);
-};
 
 // example req.body
 
@@ -50,7 +57,7 @@ Trade.statics.findAndModify = function(query, sort, doc, options, cb) {
 Trade.statics.initiate = function(parties, stages, cb) {
 
   mongoose.model("book").find(
-    { _id: { $in: stages.initiand.concat(stages.acceptand) } },
+    { _id: { $in: stages.initiand.concat(stages.acceptand).map(toObjectId) } },
     (err, books) => {
       if(err) {
         return cb(err);
@@ -75,21 +82,31 @@ Trade.statics.initiate = function(parties, stages, cb) {
 
       let trade = new this(tradeInfo);
 
-      trade.save((err) => {
+      trade.save((err, savedTrade) => {
         if(err) {
           return cb(err);
         }
 
-        mongoose.model("book").findAndModify(
-          { _id: { $in: stages.initiand.concat(stages.acceptand) } },
-          [],
+        mongoose.model("book").update(
+          { _id: { $in: stages.initiand.concat(stages.acceptand).map(toObjectId) } },
           { $set: { available: false } },
-          {},
+          { multi: true },
           (err) => {
             if(err) {
               return cb(err);
             }
-            cb();
+            mongoose.model("user").update(
+              { _id: { $in: [parties.initiand, parties.acceptand].map(toObjectId) } },
+              { $push: { trades: savedTrade._id } },
+              { multi: true },
+              (err) => {
+                if(err) {
+                  return cb(err);
+                }
+
+                cb(null, savedTrade._id);
+              }
+            );
           }
         );
       });
@@ -117,7 +134,7 @@ Trade.statics.initiate = function(parties, stages, cb) {
  */
 Trade.statics.accept = function(tradeId, acceptandId, cb) {
   this.findOne(
-    { _id: tradeId, acceptand: acceptandId },
+    { _id: toObjectId(tradeId), acceptand: toObjectId(acceptandId) },
     (err, trade) => {
       if(err) {
         return cb(err);
@@ -127,19 +144,18 @@ Trade.statics.accept = function(tradeId, acceptandId, cb) {
       }
 
       // free books and swap owners
-      mongoose.model("book").findAndModify(
-        { _id: { $in: trade.initiand_stage } },
-        [],
-        { $set: { available: true, owner: trade.acceptand } },
-        {},
+      mongoose.model("book").update(
+        { _id: { $in: trade.initiand_stage.map(toObjectId) } },
+        { $set: { available: true, owner: toObjectId(trade.acceptand._id) } },
+        { multi: true },
         (err) => {
           if(err) {
             return cb(err);
           }
-          mongoose.model("book").findAndModify(
-            { _id: { $in: trade.acceptand_stage } },
-            [],
-            { $set: { available: true, owner: trade.initiand } },
+          mongoose.model("book").update(
+            { _id: { $in: trade.acceptand_stage.map(toObjectId) } },
+            { $set: { available: true, owner: toObjectId(trade.initiand._id) } },
+            { multi: true },
             (err) => {
               if(err) {
                 return cb(err);
@@ -158,7 +174,7 @@ Trade.statics.accept = function(tradeId, acceptandId, cb) {
   );
 };
 
-// example req.body
+// example req.query
 
 /*
   {
@@ -177,7 +193,7 @@ Trade.statics.accept = function(tradeId, acceptandId, cb) {
  */
 Trade.statics.decline = function(tradeId, declinerId, cb) {
   this.findOne(
-    { _id: tradeId },
+    { _id: toObjectId(tradeId) },
     (err, trade) => {
       if(err) {
         return cb(err);
@@ -186,21 +202,19 @@ Trade.statics.decline = function(tradeId, declinerId, cb) {
         return cb(errors.tradeNotFoundError());
       }
 
-      mongoose.model("book").findAndModify(
-        { owner: trade.initiand },
-        [],
+      mongoose.model("book").update(
+        { owner: toObjectId(trade.initiand) },
         { $set: { available: true } },
-        {},
+        { multi: true },
         (err) => {
           if(err) {
             return cb(err);
           }
 
-          mongoose.model("book").findAndModify(
-            { owner: trade.acceptand },
-            [],
+          mongoose.model("book").update(
+            { owner: toObjectId(trade.acceptand) },
             { $set: { available: true } },
-            {},
+            { multi: true },
             (err) => {
               if(err) {
                 return cb(err);
@@ -245,7 +259,7 @@ Trade.statics.decline = function(tradeId, declinerId, cb) {
  */
 Trade.statics.negotiate = function(tradeId, negotiatorId, nextStages, cb) {
   this.findOne(
-    { _id: tradeId },
+    { _id: toObjectId(tradeId) },
     (err, trade) => {
       if(err) {
         return cb(err);
@@ -258,40 +272,38 @@ Trade.statics.negotiate = function(tradeId, negotiatorId, nextStages, cb) {
       let diffAcceptand = diff(trade.acceptand_stage, nextStages.acceptand);
 
       // free all books that are no longer in the staging area
-      mongoose.model("book").findAndModify(
-        { _id: { $in: diffInitiand.remove.concat(diffAcceptand.remove) } },
-        [],
+      mongoose.model("book").update(
+        { _id: { $in: diffInitiand.remove.concat(diffAcceptand.remove).map(toObjectId) } },
         { $set: { available: true } },
-        {},
+        { multi: true },
         (err) => {
           if(err) {
             return cb(err);
           }
 
           // reserve all books that got added to the staging area
-          mongoose.model("book").findAndModify(
-            { _id: { $in: diffInitiand.add.concat(diffAcceptand.add) } },
-            [],
+          mongoose.model("book").update(
+            { _id: { $in: diffInitiand.add.concat(diffAcceptand.add).map(toObjectId) } },
             { $set: { available: false } },
-            {},
+            { multi: true },
             (err) => {
               if(err) {
                 return cb(err);
               }
 
-              trade.initiand_stage = nextStages.initiand;
-              trade.acceptand_stage = nextStages.acceptand;
+              trade.initiand_stage = nextStages.initiand.map(toObjectId);
+              trade.acceptand_stage = nextStages.acceptand.map(toObjectId);
 
               trade.state = {
                 type: "negotiate",
-                by: negotiatorId
+                by: toObjectId(negotiatorId)
               };
 
-              trade.save((err) => {
+              trade.save((err, savedTrade) => {
                 if(err) {
                   return cb(err);
                 }
-                cb();
+                cb(null, savedTrade);
               });
             }
           );
@@ -300,5 +312,28 @@ Trade.statics.negotiate = function(tradeId, negotiatorId, nextStages, cb) {
     }
   );
 };
+
+Trade.pre("findOne", function(next) {
+  this.populate("initiand acceptand");
+  next();
+});
+
+Trade.pre("remove", function(next) {
+  mongoose.model("user").update(
+    { trades: this._id },
+    { $pull: { trades: this._id } },
+    { multi: true },
+    (err) => {
+      if(err) {
+        return next(err);
+      }
+      next();
+    }
+  );
+});
+
+Trade.plugin(normalizerPlugin, {
+  normalizers: require("./utils/normalizers").trade
+});
 
 module.exports = mongoose.model("trade", Trade);
