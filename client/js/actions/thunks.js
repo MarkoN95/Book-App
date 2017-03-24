@@ -373,7 +373,7 @@ module.exports = {
             let selfLibrary = loadedTrade.self_library;
             let selfRole = initialOther.role === "initiand" ? "acceptand" : "initiand";
 
-            trade[initialOther.role + "_stage"].map((bid) => {
+            trade[initialOther.role + "_stage"].forEach((bid) => {
               let foundBook = otherLibrary.find((book) => {
                 return book.id === bid;
               });
@@ -381,7 +381,7 @@ module.exports = {
               dispatch(addToStage("other", foundBook));
             });
 
-            trade[selfRole + "_stage"].map((bid) => {
+            trade[selfRole + "_stage"].forEach((bid) => {
               let foundBook = selfLibrary.find((book) => {
                 return book.id === bid;
               });

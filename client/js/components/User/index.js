@@ -246,13 +246,9 @@ const mapDispatchToProps = function(dispatch, ownProps) {
       dispatch(thunks.removeBook(book));
     },
     openTrade: function(trade, selfId) {
-      let initialOther = trade.initiand.id !== selfId ?
-      Object.assign({}, trade.initiand, {
-        role: "initiand"
-      }) :
-      Object.assign({}, trade.acceptand, {
-        role: "acceptand"
-      });
+      let initialOther = trade.initiand.id === selfId ?
+      Object.assign({}, trade.acceptand, { role: "acceptand" }) :
+      Object.assign({}, trade.initiand, { role: "initiand" });
       dispatch(thunks.loadTradeUI(trade, initialOther, null, ownProps));
     }
   };

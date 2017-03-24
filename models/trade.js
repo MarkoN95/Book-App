@@ -132,9 +132,18 @@ Trade.statics.initiate = function(parties, stages, cb) {
  * acceptandId: objectId of the acceptand of the trade
  * cb:          callback with signature callback(err) error may occur internally or if acceptandId is not the acceptand of the trade
  */
-Trade.statics.accept = function(tradeId, acceptandId, cb) {
+Trade.statics.accept = function(tradeId, accepterId, cb) {
   this.findOne(
-    { _id: toObjectId(tradeId), acceptand: toObjectId(acceptandId) },
+    { $and: [
+      { _id: toObjectId(tradeId) },
+      {
+        $or: [
+          { initiand: toObjectId(accepterId) },
+          { acceptand: toObjectId(accepterId) }
+        ]
+      }
+    ] },
+    //{ _id: toObjectId(tradeId), acceptand: toObjectId(accepterId) },
     (err, trade) => {
       if(err) {
         return cb(err);
@@ -145,27 +154,63 @@ Trade.statics.accept = function(tradeId, acceptandId, cb) {
 
       // free books and swap owners
       mongoose.model("book").update(
-        { _id: { $in: trade.initiand_stage.map(toObjectId) } },
+        { _id: { $in: trade.initiand_stage } },
         { $set: { available: true, owner: toObjectId(trade.acceptand._id) } },
         { multi: true },
         (err) => {
           if(err) {
             return cb(err);
           }
-          mongoose.model("book").update(
-            { _id: { $in: trade.acceptand_stage.map(toObjectId) } },
-            { $set: { available: true, owner: toObjectId(trade.initiand._id) } },
-            { multi: true },
+          mongoose.model("user").findOneAndUpdate(
+            { _id: trade.initiand._id },
+            { $pullAll: { library: trade.initiand_stage } },
             (err) => {
               if(err) {
                 return cb(err);
               }
-              trade.remove((err) => {
-                if(err) {
-                  return cb(err);
+              mongoose.model("user").findOneAndUpdate(
+                { _id: trade.initiand._id },
+                { $push: { library: { $each: trade.acceptand_stage } } },
+                (err) => {
+                  if(err) {
+                    return cb(err);
+                  }
+                  mongoose.model("book").update(
+                    { _id: { $in: trade.acceptand_stage } },
+                    { $set: { available: true, owner: toObjectId(trade.initiand._id) } },
+                    { multi: true },
+                    (err) => {
+                      if(err) {
+                        return cb(err);
+                      }
+                      mongoose.model("user").findOneAndUpdate(
+                        { _id: trade.acceptand._id },
+                        { $pullAll: { library: trade.acceptand_stage } },
+                        (err) => {
+                          if(err) {
+                            return cb(err);
+                          }
+                          mongoose.model("user").findOneAndUpdate(
+                            { _id: trade.acceptand._id },
+                            { $push: { library: { $each: trade.initiand_stage } } },
+                            (err) => {
+                              if(err) {
+                                return cb(err);
+                              }
+                              trade.remove((err) => {
+                                if(err) {
+                                  return cb(err);
+                                }
+                                cb();
+                              });
+                            }
+                          );
+                        }
+                      );
+                    }
+                  );
                 }
-                cb();
-              });
+              );
             }
           );
         }
