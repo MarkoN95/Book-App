@@ -24,5 +24,9 @@
 }
 
 :global .error-msg {
-  color: #ff0000;
+  margin: 2px;
+  padding: 16px;
+  background-color: #F2DEDE;
+  border-radius: 5px;
+  color: #C26142;
 }
