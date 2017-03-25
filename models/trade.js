@@ -143,13 +143,16 @@ Trade.statics.accept = function(tradeId, accepterId, cb) {
         ]
       }
     ] },
-    //{ _id: toObjectId(tradeId), acceptand: toObjectId(accepterId) },
     (err, trade) => {
       if(err) {
         return cb(err);
       }
       if(!trade) {
         return cb(errors.tradeNotFoundError());
+      }
+
+      if(trade.initiand._id.equals(toObjectId(accepterId))) {
+        return cb(errors.acceptOwnInitiatedTradeError());
       }
 
       // free books and swap owners
