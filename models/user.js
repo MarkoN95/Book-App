@@ -7,6 +7,7 @@ const normalizerPlugin = require("./plugins/normalizer");
 const checker = require("./utils/checker");
 
 const errors = require("./utils/errors");
+const each = require("async/each");
 
 const User = mongoose.Schema({
   local: {
@@ -144,14 +145,6 @@ User.statics.removeUser = function(userId, cb) {
   });
 };
 
-const autoPopulateLibrary = function(next) {
-  this.populate({
-    path: "library",
-    select: "-owner"
-  });
-  next();
-};
-
 const autoPopulateLibraryAndTrades = function(next) {
   this.populate([
     {
@@ -175,23 +168,33 @@ const autoPopulateLibraryAndTrades = function(next) {
   next();
 };
 
-// TODO: find a better method to hook up different pre middleware that differentiates between when
-// the trades are populated as well and when not (right now find vs finOne) but this doesn't feel right
-
-User.pre("find", autoPopulateLibrary);
 User.pre("findOne", autoPopulateLibraryAndTrades);
 
 User.pre("remove", function(next) {
-  mongoose.model("book").remove({ owner: this._id }, (err) => {
-    if(err) {
-      return next(err);
+  var user = this;
+  each(
+    this.trades,
+    function(trade, cb) {
+      mongoose.model("trade").decline(trade._id.toString(16), user._id.toString(16), (err) => {
+        if(err) {
+          return cb(err);
+        }
+        cb();
+      });
+    },
+    function(err) {
+      if(err) {
+        return next(err);
+      }
+      mongoose.model("book").remove({ owner: this._id }, (err) => {
+        if(err) {
+          return next(err);
+        }
+        next();
+      });
     }
-    next();
-  });
+  );
 });
-
-// TODO:
-// Cancel all pending trades upon account deletion
 
 User.plugin(localAuthPlugin, {
   usernameField: "local.username",
