@@ -75,8 +75,6 @@ const Marketplace = React.createClass({
               request.data.items.map((book) => {
                 return(
                   <Book
-                    //renderActionAsLink
-                    //to="/trade/new"
                     key={book.id}
                     data={book}
                     type="trade"

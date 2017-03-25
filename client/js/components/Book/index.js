@@ -87,7 +87,7 @@ const Book = React.createClass({
             {
               !book.hasImage &&
               <span>
-                <b>Title: </b>{book.title}<br/>
+                <b>Title: </b>{this.limitLength(book.title)}<br/>
               </span>
             }
             <span>

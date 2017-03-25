@@ -248,7 +248,7 @@ Trade.statics.decline = function(tradeId, declinerId, cb) {
       }
 
       mongoose.model("book").update(
-        { owner: toObjectId(trade.initiand) },
+        { owner: trade.initiand._id },
         { $set: { available: true } },
         { multi: true },
         (err) => {
@@ -257,7 +257,7 @@ Trade.statics.decline = function(tradeId, declinerId, cb) {
           }
 
           mongoose.model("book").update(
-            { owner: toObjectId(trade.acceptand) },
+            { owner: trade.acceptand._id },
             { $set: { available: true } },
             { multi: true },
             (err) => {

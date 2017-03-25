@@ -144,7 +144,7 @@ const User = React.createClass({
                     </p> :
                     user.trades.map((trade) => {
                       return(
-                        <Trade data={trade} selfId={user.id} action={openTrade}/>
+                        <Trade key={trade.id} data={trade} selfId={user.id} action={openTrade}/>
                       );
                     })
                   }
