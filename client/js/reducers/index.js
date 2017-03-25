@@ -11,7 +11,8 @@ const {
   ADD_BOOK,
   BOOK_REMOVE_REQUEST,
   REMOVE_BOOK,
-  MARKETPLACE_SEARCH_REQUEST
+  MARKETPLACE_SEARCH_REQUEST,
+  SAVE_LAST_SEARCH
 } = require("../actions/types");
 
 const login             = createFormReducer("login");
@@ -27,7 +28,16 @@ const trade             = require("./trade");
 
 const marketplace = composeReducers({
   search: createFormReducer("search"),
-  request: createRequestReducer(MARKETPLACE_SEARCH_REQUEST)
+  request: createRequestReducer(MARKETPLACE_SEARCH_REQUEST),
+  lastInput: function(state, action) {
+    switch(action.type) {
+      case SAVE_LAST_SEARCH:
+        return Object.assign({}, state, { type: action.search_type, text: action.text });
+
+      default:
+        return state;
+    }
+  }
 });
 
 const addBook = composeReducers({

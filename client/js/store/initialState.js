@@ -22,7 +22,11 @@ module.exports = {
   },
   marketplace: {
     search: {
-      query: ""
+      query: "",
+    },
+    lastInput: {
+      type: null,
+      text: ""
     },
     request: createRequest()
   },

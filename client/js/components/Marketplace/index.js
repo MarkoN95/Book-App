@@ -110,9 +110,11 @@ const mapDispatchToProps = function(dispatch, ownProps) {
     },
     searchMarketplace: function(e) {
       e.preventDefault();
+      dispatch(thunks.saveLastSearch({ type: "query" }));
       dispatch(thunks.findBooks());
     },
     searchWithOption: function(eventKey) {
+      dispatch(thunks.saveLastSearch({ type: "option", option: eventKey }));
       dispatch(thunks.findBooks(eventKey));
     },
     initiateTrade: function(book) {

@@ -13,7 +13,8 @@ const {
   setBookAvailability,
   addTrade,
   deleteTrade,
-  replaceTrade
+  replaceTrade,
+  saveLastSearch
 } = Object.assign(
   {},
   require("./request"),
@@ -106,7 +107,7 @@ function ajaxRequest({ dispatch, type, verb, url, body, onSuccess, final, finalF
   });
 }
 
-module.exports = {
+const thunks = module.exports = {
   register: function(ownProps) {
     return function(dispatch, getState) {
       ajaxRequest({
@@ -175,6 +176,34 @@ module.exports = {
         url: "/api/books/find?" + (option ? "option=" + option : "query=" + query),
         passData: true
       });
+    };
+  },
+  reloadMarketPlace: function() {
+    return function(dispatch, getState) {
+      const last = getState().marketplace.lastInput;
+
+      if(last.type === null) {
+        return;
+      }
+      ajaxRequest({
+        dispatch,
+        type: MARKETPLACE_SEARCH_REQUEST,
+        verb: "get",
+        url: "/api/books/find?" + (last.type === "option" ? "option=" + last.text : "query=" + last.text),
+        passData: true
+      });
+    };
+  },
+  saveLastSearch: function(input) {
+    return function(dispatch, getState) {
+      const query = getState().marketplace.search.query;
+
+      if(input.type === "option") {
+        dispatch(saveLastSearch("option", input.option));
+      }
+      else if(input.type === "query") {
+        dispatch(saveLastSearch("query", query));
+      }
     };
   },
   searchBooks: function() {
@@ -430,6 +459,7 @@ module.exports = {
         onSuccess: function(res) {
           dispatch(setBookAvailability(payload.stages.initiand, false));
           dispatch(addTrade(res.data));
+          dispatch(thunks.reloadMarketPlace());
         },
         final: function() {
           ownProps.router.push("/user");
@@ -453,6 +483,7 @@ module.exports = {
         body: payload,
         onSuccess: function(res) {
           dispatch(updateUser(res.data));
+          dispatch(thunks.reloadMarketPlace());
         },
         final: function() {
           ownProps.router.push("/user");
@@ -480,6 +511,7 @@ module.exports = {
         onSuccess: function() {
           dispatch(setBookAvailability(booksToFree, true));
           dispatch(deleteTrade(state.trade.id));
+          dispatch(thunks.reloadMarketPlace());
         },
         final: function() {
           ownProps.router.push("/user");
@@ -520,6 +552,7 @@ module.exports = {
           // selfDiff.remove are book that were removed from the stage so avaliable must be set to true
           dispatch(setBookAvailability(selfDiff.add, false));
           dispatch(setBookAvailability(selfDiff.remove, true));
+          dispatch(thunks.reloadMarketPlace());
         },
         final: function() {
           ownProps.router.push("/user");

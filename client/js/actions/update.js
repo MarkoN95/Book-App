@@ -13,5 +13,12 @@ module.exports = {
     return {
       type: types.TOGGLE_MODAL
     };
+  },
+  saveLastSearch: function(search_type, text) {
+    return {
+      type: types.SAVE_LAST_SEARCH,
+      search_type,
+      text
+    };
   }
 };
