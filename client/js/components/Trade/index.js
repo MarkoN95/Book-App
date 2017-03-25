@@ -144,7 +144,7 @@ const Trade = React.createClass({
             router.location.pathname === "/trade/new" &&
             <Col xs={12} className="text-center">
               <Button bsStyle="info" onClick={initiateTrade} disabled={trade_request.isPending}>
-                {trade_request.isPending ? "Processing..." : "Initiate Trade"}
+                {trade_request.isPending ? "Processing..." : "Propose Trade"}
               </Button>
             </Col>
           }
