@@ -186,7 +186,7 @@ User.pre("remove", function(next) {
       if(err) {
         return next(err);
       }
-      mongoose.model("book").remove({ owner: this._id }, (err) => {
+      mongoose.model("book").remove({ owner: user._id }, (err) => {
         if(err) {
           return next(err);
         }

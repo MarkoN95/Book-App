@@ -11,7 +11,7 @@ module.exports = function authRoutes(opt) {
   if(!Array.isArray(opt.social)) {
     throw new TypeError("authRoutes() expects social property of config to be an array");
   }
-
+  
   opt.social.forEach((method) => {
     router.get("/auth/" + method, passport.authenticate(method));
 
