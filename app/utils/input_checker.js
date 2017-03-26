@@ -147,6 +147,13 @@ const trade = {
   }
 };
 
+function checkMessageId(query) {
+  if(!isObjectId(query.messageId)) {
+    return "invalid payload";
+  }
+  return true;
+}
+
 module.exports = function check_input(type) {
   return function(req, res, next) {
     let isValid;
@@ -189,6 +196,10 @@ module.exports = function check_input(type) {
 
       case "trade_negotiate":
         isValid = trade.negotiate(req.body);
+        break;
+
+      case "message":
+        isValid = checkMessageId(req.query);
         break;
 
       default:

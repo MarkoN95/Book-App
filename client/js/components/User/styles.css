@@ -15,6 +15,10 @@
   margin-top: 16px;
 }
 
+.noMessages {
+  margin-top: 16px;
+}
+
 @media(max-width: 768px) {
   .tabsContainer {
     composes: profileContainer;
@@ -61,4 +65,22 @@
 
 .tradePartner {
   margin-left: 32px;
+}
+
+.messageSeen {
+  width: 100%;
+  margin: 4px;
+  padding: 8px;
+  border: 1px solid #222222;
+  border-radius: 3px;
+}
+
+.message {
+  composes: messageSeen;
+  border: 1px solid rgba(135, 206, 250, .8);
+  box-shadow: 0 0 8px rgba(135, 206, 250, .8)
+}
+
+.messageText {
+  margin-left: 36px;
 }

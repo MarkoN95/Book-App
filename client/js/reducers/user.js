@@ -47,6 +47,16 @@ const user = function(state, action) {
         })
       });
 
+    case types.MARK_MESSAGE_AS_SEEN:
+      return Object.assign({}, state, {
+        message_cache: state.message_cache.map((msg) => {
+          if(msg.id === action.msgId) {
+            return Object.assign({}, msg, { seen: true });
+          }
+          return msg;
+        })
+      });
+
     default:
       return state;
   }

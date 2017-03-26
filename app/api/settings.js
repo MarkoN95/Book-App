@@ -36,6 +36,15 @@ router.delete("/api/settings/delete", (req, res) => {
   });
 });
 
+router.put("/api/settings/markMessageAsSeen", ensureAuth, check_input("message"), (req, res) => {
+  User.markMessageAsSeen(req.user._id, req.query.messageId, (err) => {
+    if(err) {
+      return res.status(400).end();
+    }
+    res.status(204).end();
+  });
+});
+
 module.exports = function() {
   return router;
 };

@@ -49,5 +49,11 @@ module.exports = {
       type: types.REPLACE_TRADE,
       trade
     };
+  },
+  markMessageAsSeen: function(msgId) {
+    return {
+      type: types.MARK_MESSAGE_AS_SEEN,
+      msgId
+    };
   }
 };

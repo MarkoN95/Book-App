@@ -48,7 +48,8 @@ const User = mongoose.Schema({
   message_cache: [
     {
       from: Date,
-      text: String
+      text: String,
+      seen: { type: Boolean, default: false }
     }
   ]
 });
@@ -143,6 +144,45 @@ User.statics.removeUser = function(userId, cb) {
       cb();
     });
   });
+};
+
+//add a message object to message_cache and if cache exceeds length of 10 then remove oldest message
+User.statics.pushMessage = function(userId, messagetxt, cb) {
+  this.findOne({ _id: userId }, (err, user) => {
+    if(err) {
+      return cb(err);
+    }
+    if(user.message_cache.length === 10) {
+      user.message_cache.sort((a, b) => b.from - a.from);
+      user.message_cache.shift();
+    }
+
+    user.message_cache.push({
+      from: new Date(),
+      seen: false,
+      text: messagetxt
+    });
+
+    user.save((err) => {
+      if(err) {
+        return cb(err);
+      }
+      cb();
+    });
+  });
+};
+
+User.statics.markMessageAsSeen = function(userId, messageId, cb) {
+  this.findOneAndUpdate(
+    { _id: userId, "message_cache._id": messageId },
+    { $set: { "message_cache.$.seen": true } },
+    (err) => {
+      if(err) {
+        return cb(err);
+      }
+      cb();
+    }
+  );
 };
 
 const autoPopulateLibraryAndTrades = function(next) {

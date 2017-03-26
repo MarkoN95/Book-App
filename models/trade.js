@@ -204,7 +204,16 @@ Trade.statics.accept = function(tradeId, accepterId, cb) {
                                 if(err) {
                                   return cb(err);
                                 }
-                                cb();
+                                mongoose.model("user").pushMessage(
+                                  trade.initiand._id,
+                                  trade.acceptand[trade.acceptand.login_method].username + " accepted your trade",
+                                  (err) => {
+                                    if(err) {
+                                      return cb(err);
+                                    }
+                                    cb();
+                                  }
+                                );
                               });
                             }
                           );
@@ -272,7 +281,23 @@ Trade.statics.decline = function(tradeId, declinerId, cb) {
                 if(err) {
                   return cb(err);
                 }
-                cb();
+                var selfDeclined = trade.initiand._id.equals(toObjectId(declinerId));
+                var reciever = !selfDeclined ? trade.initiand._id : trade.acceptand._id;
+
+                var declinerName = selfDeclined ?
+                trade.initiand[trade.initiand.login_method].username :
+                trade.acceptand[trade.acceptand.login_method].username;
+
+                mongoose.model("user").pushMessage(
+                  reciever,
+                  selfDeclined ? declinerName + " declined his own trade" : declinerName + " declined your trade",
+                  (err) => {
+                    if(err) {
+                      return cb(err);
+                    }
+                    cb();
+                  }
+                );
               });
             }
           );

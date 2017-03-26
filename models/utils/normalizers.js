@@ -52,7 +52,15 @@ const user_normalizers = {
        normalizeOwnLibrary(user),
        normalizeTrades(user),
       {
-        message_cache: user.message_cache
+        message_cache: user.message_cache.map((msg) => {
+          return {
+            from: msg.from,
+            text: msg.text,
+            seen: msg.seen,
+            id: msg._id
+          };
+        })
+        .sort((a, b) => b.from - a.from)
       }
      );
   },

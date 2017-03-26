@@ -9,62 +9,8 @@ const actions = Object.assign({}, require("../../actions/update"), require("../.
 
 const styles = require("./styles.css");
 const Book = require("../Book");
-
-const displayTradeTitle = function(trade, selfId) {
-  switch(trade.state.type) {
-    case "initiated":
-      if(trade.initiand.id === selfId) {
-        return "You want to trade with " + trade.acceptand.username;
-      }
-      return trade.initiand.username + " wants to trade with you";
-
-    case "negotiate":
-      if(trade.state.by === selfId) {
-        if(trade.initiand.id === selfId) {
-          return "You want to negotiate with " + trade.acceptand.username;
-        }
-        if(trade.acceptand.id === selfId) {
-          return "You want to negotiate with " + trade.initiand.username;
-        }
-      }
-      else {
-        if(trade.initiand.id === trade.state.by) {
-          return trade.initiand.username + " wants to negotiate with you";
-        }
-        if(trade.acceptand.id === trade.state.by) {
-          return trade.acceptand.username + " wants to negotiate with you";
-        }
-      }
-
-  }
-};
-
-const Trade = function(props) {
-  return(
-    <div className={styles.tradeLink}>
-      <div>
-        <Image
-          src={props.data.acceptand.image_url}
-          className={styles.tradeImage}
-          responsive
-          circle
-        />
-        <span className={styles.tradePartner}>
-          {displayTradeTitle(props.data, props.selfId)}
-        </span>
-      </div>
-      <Button className="btnInverse pull-right" onClick={props.action.bind(this, props.data, props.selfId)}>
-        View
-      </Button>
-    </div>
-  );
-};
-
-Trade.propTypes = {
-  selfId: string.isRequired,
-  data: object.isRequired,
-  action: func.isRequired
-};
+const Trade = require("./trade");
+const Message = require("./message");
 
 const User = React.createClass({
   propTypes: {
@@ -75,6 +21,7 @@ const User = React.createClass({
     addBook: func.isRequired,
     removeBook: func.isRequired,
     openTrade: func.isRequired,
+    markMessageAsSeen: func.isRequired,
     bookSearch: shape({
       isPending: bool.isRequired,
       success: bool,
@@ -101,8 +48,9 @@ const User = React.createClass({
     })
   },
   render: function() {
-    let { user, bookSearch, bookAdd, bookRemove, submitSearch, search, update, addBook, removeBook, openTrade } = this.props;
-
+    let { user, bookSearch, bookAdd, bookRemove, submitSearch, search, update, addBook, removeBook, openTrade, markMessageAsSeen } = this.props;
+    let totalUnreadMessages = 0;
+    user.message_cache.forEach((m) => !m.seen ? ++totalUnreadMessages : false);
     return(
       <Grid className="mainGrid" fluid>
         <Row className={styles.profileRow}>
@@ -234,6 +182,19 @@ const User = React.createClass({
                   </Col>
                 </Row>
                 </Tab>
+                <Tab eventKey={4} title={totalUnreadMessages === 0 ? "Messages" : "Messages (" + totalUnreadMessages + ")"}>
+                  {
+                    user.message_cache.length === 0 &&
+                    <p className={"text-center " + styles.noMessages}>
+                      You have no messages at the moment
+                    </p>
+                  }
+                  {user.message_cache.map((msg) => {
+                    return(
+                      <Message key={msg.id} message={msg} onMouseOver={markMessageAsSeen}/>
+                    );
+                  })}
+                </Tab>
               </Tabs>
             </div>
           </Col>
@@ -275,6 +236,12 @@ const mapDispatchToProps = function(dispatch, ownProps) {
       Object.assign({}, trade.acceptand, { role: "acceptand" }) :
       Object.assign({}, trade.initiand, { role: "initiand" });
       dispatch(thunks.loadTradeUI(trade, initialOther, null, ownProps));
+    },
+    markMessageAsSeen: function(msg) {
+      if(msg.seen) {
+        return;
+      }
+      dispatch(thunks.markMessageAsSeen(msg.id));
     }
   };
 };

@@ -14,7 +14,8 @@ const {
   addTrade,
   deleteTrade,
   replaceTrade,
-  saveLastSearch
+  saveLastSearch,
+  markMessageAsSeen
 } = Object.assign(
   {},
   require("./request"),
@@ -558,6 +559,12 @@ const thunks = module.exports = {
           ownProps.router.push("/user");
         }
       });
+    };
+  },
+  markMessageAsSeen: function(msgId) {
+    return function(dispatch) {
+      dispatch(markMessageAsSeen(msgId));
+      axios.put("/api/settings/markMessageAsSeen?messageId=" + msgId);
     };
   }
 };
