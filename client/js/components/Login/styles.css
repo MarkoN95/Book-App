@@ -1,3 +1,8 @@
+.loginContainer {
+  padding: 16px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+}
+
 .socialLogin {
   margin-top: 50px;
 }

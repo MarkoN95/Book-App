@@ -30,7 +30,7 @@ const Login = React.createClass({
 
     return (
       <Grid className="mainGrid" fluid>
-        <Row>
+        <Row className={styles.loginContainer}>
           <Col md={4} sm={8} xs={10} mdOffset={4} smOffset={2} xsOffset={1}>
             <h3 className="text-center">Native Login</h3>
             <Form onSubmit={this.props.login}>

@@ -56,7 +56,7 @@ const Trade = React.createClass({
               <p className={styles.stageDesc}>Your Demands</p>
             }
           </Col>
-          <Col sm={6} xs={12} className={styles.library}>
+          <Col sm={6} xs={12}>
             <div className={styles.user}>
               <Image
                 src={other.image_url}
@@ -69,7 +69,7 @@ const Trade = React.createClass({
               </span>
             </div>
             <hr style={{color: "#dddddd"}}/>
-            <div>
+            <div className={styles.library}>
               {other_library.map((book) => {
                 return(
                   <Book
@@ -101,7 +101,7 @@ const Trade = React.createClass({
               <p className={styles.stageDesc}>Your Offer</p>
             }
           </Col>
-          <Col sm={6} xs={12} className={styles.library}>
+          <Col sm={6} xs={12}>
             <div className={styles.user}>
               <Image
                 src={self.image_url}
@@ -114,7 +114,7 @@ const Trade = React.createClass({
               </span>
             </div>
             <hr style={{color: "#dddddd"}}/>
-            <div>
+            <div className={styles.library}>
               {self_library.map((book) => {
                 return(
                   <Book

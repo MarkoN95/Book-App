@@ -34,11 +34,6 @@ const Main = React.createClass({
             <Navbar.Toggle/>
           </Navbar.Header>
           <Navbar.Collapse>
-            <Nav>
-              <LinkContainer to="/marketplace">
-                <NavItem>Marketplace</NavItem>
-              </LinkContainer>
-            </Nav>
             {
               !user &&
               <Nav pullRight>

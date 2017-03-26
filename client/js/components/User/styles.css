@@ -44,6 +44,7 @@
 }
 
 .tradeLink {
+  background-color: #dfdfdf;
   margin: 8px;
   padding: 8px;
   box-shadow: 0 0 8px rgba(0, 0, 0, .8);

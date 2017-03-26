@@ -4,6 +4,8 @@ const { Grid, Row, Col, Form, FormGroup, FormControl, InputGroup, DropdownButton
 const { string, bool, object, shape, func } = React.PropTypes;
 const Book = require("../Book");
 
+const styles = require("./styles.css");
+
 const actions = require("../../actions/update");
 const thunks = require("../../actions/thunks");
 
@@ -24,73 +26,75 @@ const Marketplace = React.createClass({
   render: function() {
     let { query, request, update, searchMarketplace, searchWithOption, initiateTrade } = this.props;
     return (
-      <Grid  className="mainGrid" fluid>
-        <Row>
-          <Col md={8} sm={8} xs={12} mdOffset={2} smOffset={2}>
-            <h3 className="text-center">Search the Marketplace and start trading</h3>
-            <Form onSubmit={searchMarketplace}>
-              <FormGroup>
-                <InputGroup>
-                  <FormControl
-                    type="text"
-                    name="query"
-                    placeholder="title or author"
-                    value={query}
-                    onChange={update}
-                  />
-                  <DropdownButton
-                    onSelect={searchWithOption}
-                    className="btnInverse"
-                    componentClass={InputGroup.Button}
-                    id="marketplace-search-options"
-                    title="find"
-                  >
-                    <MenuItem eventKey="all">All Books</MenuItem>
-                    <MenuItem eventKey="latest">Latest Additions</MenuItem>
-                  </DropdownButton>
-                </InputGroup>
-              </FormGroup>
-            </Form>
-            <hr/>
-          </Col>
-        </Row>
-        <Row>
-          <Col md={8} sm={8} xs={12} mdOffset={2} smOffset={2}>
-            {
-              request.error &&
-              !request.isPending &&
-              <p className="error-msg">
-                {request.error.message}
-              </p>
-            }
-            {
-              request.isPending &&
-              <div className="text-center">
-                <i className="fa fa-spinner fa-spin fa-2x"/>
-              </div>
-            }
-            {
-              request.data &&
-              request.data.items &&
-              request.data.items.map((book) => {
-                return(
-                  <Book
-                    key={book.id}
-                    data={book}
-                    type="trade"
-                    action={initiateTrade}
-                  />
-                );
-              })
-            }
-            {
-              request.data &&
-              request.data.items &&
-              request.data.items.length === 0 &&
-              <h4 className="text-center">No books</h4>
-            }
-          </Col>
-        </Row>
+      <Grid className="mainGrid" fluid>
+        <div className={styles.marketplaceContainer}>
+          <Row>
+            <Col md={8} sm={8} xs={12} mdOffset={2} smOffset={2}>
+              <h3 className="text-center">Search the Marketplace and start trading</h3>
+              <Form onSubmit={searchMarketplace}>
+                <FormGroup>
+                  <InputGroup>
+                    <FormControl
+                      type="text"
+                      name="query"
+                      placeholder="title or author"
+                      value={query}
+                      onChange={update}
+                    />
+                    <DropdownButton
+                      onSelect={searchWithOption}
+                      className="btnInverse"
+                      componentClass={InputGroup.Button}
+                      id="marketplace-search-options"
+                      title="find"
+                    >
+                      <MenuItem eventKey="all">All Books</MenuItem>
+                      <MenuItem eventKey="latest">Latest Additions</MenuItem>
+                    </DropdownButton>
+                  </InputGroup>
+                </FormGroup>
+              </Form>
+              <hr/>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={8} sm={8} xs={12} mdOffset={2} smOffset={2}>
+              {
+                request.error &&
+                !request.isPending &&
+                <p className="error-msg">
+                  {request.error.message}
+                </p>
+              }
+              {
+                request.isPending &&
+                <div className="text-center">
+                  <i className="fa fa-spinner fa-spin fa-2x"/>
+                </div>
+              }
+              {
+                request.data &&
+                request.data.items &&
+                request.data.items.map((book) => {
+                  return(
+                    <Book
+                      key={book.id}
+                      data={book}
+                      type="trade"
+                      action={initiateTrade}
+                    />
+                  );
+                })
+              }
+              {
+                request.data &&
+                request.data.items &&
+                request.data.items.length === 0 &&
+                <h4 className="text-center">No books</h4>
+              }
+            </Col>
+          </Row>
+        </div>
       </Grid>
     );
   }
