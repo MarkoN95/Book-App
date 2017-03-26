@@ -11,6 +11,16 @@
   white-space: nowrap;
 }
 
+
+.otherLibReq {
+  text-align: center;
+  padding-top: 24px;
+}
+
+.loader {
+  color: #dddddd;
+}
+
 .tradeBackGround {
   padding: 5px;
   border-radius: 5px;

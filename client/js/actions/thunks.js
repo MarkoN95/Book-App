@@ -34,7 +34,7 @@ const {
   CHANGE_PW_REQUEST,
   DELETE_ACCOUNT_REQUEST,
   MARKETPLACE_SEARCH_REQUEST,
-  GET_OTHER_LIBRARAY_REQUEST,
+  GET_OTHER_LIBRARY_REQUEST,
   TRADE_REQUEST
 } = require("./types");
 
@@ -385,7 +385,7 @@ const thunks = module.exports = {
 
       ajaxRequest({
         dispatch,
-        type: GET_OTHER_LIBRARAY_REQUEST,
+        type: GET_OTHER_LIBRARY_REQUEST,
         verb: "get",
         url: "/api/books/getLibrary?ownerId=" + initialOther.id,
         onSuccess: function(res) {

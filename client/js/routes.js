@@ -38,6 +38,12 @@ const routes = function(store) {
     }
   };
 
+  const redirectAuth = (nextState, replaceState) => {
+    if(store.getState().user) {
+      replaceState({ pathname: "/user" });
+    }
+  };
+
   return (
     <Route path="/" component={Main}>
       <IndexRoute component={Marketplace}/>
@@ -54,11 +60,13 @@ const routes = function(store) {
       <Route
         path="/login"
         component={Login}
+        onEnter={redirectAuth}
         onLeave={purge("login")}
       />
       <Route
         path="/register"
         component={Register}
+        onEnter={redirectAuth}
         onLeave={purge("register")}
       />
       <Route

@@ -1,7 +1,7 @@
 const createRequestReducer = require("./request");
 const types = require("../actions/types");
 
-const getOtherLibraryRequst = createRequestReducer(types.GET_OTHER_LIBRARAY_REQUEST);
+const getOtherLibraryRequst = createRequestReducer(types.GET_OTHER_LIBRARY_REQUEST);
 const tradeRequest = createRequestReducer(types.TRADE_REQUEST);
 
 const trade = function(state, action) {
@@ -33,9 +33,9 @@ const trade = function(state, action) {
         [nextLibrary]: state[nextLibrary].concat([action.data])
       });
 
-    case types.GET_OTHER_LIBRARAY_REQUEST:
+    case types.GET_OTHER_LIBRARY_REQUEST:
       return Object.assign({}, state, {
-        request_other_libraray: getOtherLibraryRequst(state.request_other_libraray, action)
+        request_other_library: getOtherLibraryRequst(state.request_other_library, action)
       });
 
     case types.TRADE_REQUEST:

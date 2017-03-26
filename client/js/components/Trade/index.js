@@ -22,7 +22,7 @@ const Trade = React.createClass({
     negotiateTrade: func.isRequired
   },
   render: function() {
-    let { other_stage, other_library, self_stage, self_library, other, self, trade_request } = this.props.trade;
+    let { other_stage, other_library, self_stage, self_library, other, self, trade_request, request_other_library } = this.props.trade;
     let {
       router,
       addToSelfStage,
@@ -70,6 +70,20 @@ const Trade = React.createClass({
             </div>
             <hr style={{color: "#dddddd"}}/>
             <div className={styles.library}>
+              {
+                  request_other_library.isPending &&
+                  <div className={styles.otherLibReq}>
+                    <i className={styles.loader + " fa fa-spinner fa-spin"}/>
+                  </div>
+              }
+              {
+                request_other_library.error &&
+                <div className={styles.otherLibReq}>
+                  <p className="error-msg">
+                    {request_other_library.error.message}
+                  </p>
+                </div>
+              }
               {other_library.map((book) => {
                 return(
                   <Book
