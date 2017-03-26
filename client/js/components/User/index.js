@@ -122,7 +122,20 @@ const User = React.createClass({
                     })
                   }
                 </Tab>
-                <Tab eventKey={3} title="Add a Book">
+                <Tab eventKey={3} title={totalUnreadMessages === 0 ? "Messages" : "Messages (" + totalUnreadMessages + ")"}>
+                  {
+                    user.message_cache.length === 0 &&
+                    <p className={"text-center " + styles.noMessages}>
+                      You have no messages at the moment
+                    </p>
+                  }
+                  {user.message_cache.map((msg) => {
+                    return(
+                      <Message key={msg.id} message={msg} onMouseOver={markMessageAsSeen}/>
+                    );
+                  })}
+                </Tab>
+                <Tab eventKey={4} title="Add a Book">
                   <Row>
                     <Col xs={8} xsOffset={2} className={styles.bookSearch}>
                       <Form onSubmit={submitSearch}>
@@ -181,19 +194,6 @@ const User = React.createClass({
                     }
                   </Col>
                 </Row>
-                </Tab>
-                <Tab eventKey={4} title={totalUnreadMessages === 0 ? "Messages" : "Messages (" + totalUnreadMessages + ")"}>
-                  {
-                    user.message_cache.length === 0 &&
-                    <p className={"text-center " + styles.noMessages}>
-                      You have no messages at the moment
-                    </p>
-                  }
-                  {user.message_cache.map((msg) => {
-                    return(
-                      <Message key={msg.id} message={msg} onMouseOver={markMessageAsSeen}/>
-                    );
-                  })}
                 </Tab>
               </Tabs>
             </div>
