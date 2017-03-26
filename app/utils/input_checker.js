@@ -115,12 +115,15 @@ function stageHasError(body) {
 }
 
 const trade = {
-  initiate: function(body) {
+  initiate: function(body, initandIdCheck) {
     if(!isObjectId(body.parties && body.parties.initiand) || !isObjectId(body.parties && body.parties.acceptand) || stageHasError(body)) {
       return "invalid payload";
     }
     if(body.parties.initiand === body.parties.acceptand) {
       return "You can't start a trade with yourself";
+    }
+    if(body.parties.initiand !== initandIdCheck.toString()) {
+      return "You are not the initiand of that trade";
     }
     return true;
   },
@@ -183,7 +186,7 @@ module.exports = function check_input(type) {
         break;
 
       case "trade_initiate":
-        isValid = trade.initiate(req.body);
+        isValid = trade.initiate(req.body, req.user._id);
         break;
 
       case "trade_accept":

@@ -9,6 +9,9 @@ const diff = require("./utils/diff");
 const checker = require("./utils/checker");
 
 function toObjectId(id) {
+  if(typeof id === "object" && id.constructor === mongoose.Types.ObjectId) {
+    return id;
+  }
   if(checker.objectId(id)) {
     return mongoose.Types.ObjectId(id);
   }
@@ -250,7 +253,15 @@ Trade.statics.accept = function(tradeId, accepterId, cb) {
  */
 Trade.statics.decline = function(tradeId, declinerId, cb) {
   this.findOne(
-    { _id: toObjectId(tradeId) },
+    { $and: [
+      { _id: toObjectId(tradeId) },
+      {
+        $or: [
+          { initiand: toObjectId(declinerId) },
+          { acceptand: toObjectId(declinerId) }
+        ]
+      }
+    ] },
     (err, trade) => {
       if(err) {
         return cb(err);
@@ -332,7 +343,15 @@ Trade.statics.decline = function(tradeId, declinerId, cb) {
  */
 Trade.statics.negotiate = function(tradeId, negotiatorId, nextStages, cb) {
   this.findOne(
-    { _id: toObjectId(tradeId) },
+    { $and: [
+      { _id: toObjectId(tradeId) },
+      {
+        $or: [
+          { initiand: toObjectId(negotiatorId) },
+          { acceptand: toObjectId(negotiatorId) }
+        ]
+      }
+    ] },
     (err, trade) => {
       if(err) {
         return cb(err);
@@ -340,6 +359,7 @@ Trade.statics.negotiate = function(tradeId, negotiatorId, nextStages, cb) {
       if(!trade) {
         return cb(errors.tradeNotFoundError());
       }
+      console.log(trade);
 
       let diffInitiand = diff(trade.initiand_stage, nextStages.initiand);
       let diffAcceptand = diff(trade.acceptand_stage, nextStages.acceptand);
