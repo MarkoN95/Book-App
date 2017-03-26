@@ -50,11 +50,13 @@ const routes = function(store) {
       <Route
         path="/trade/new"
         component={Trade}
+        onEnter={requireAuth}
         onLeave={clearTradeUI}
       />
       <Route
         path="/trade"
         component={Trade}
+        onEnter={requireAuth}
         onLeave={clearTradeUI}
       />
       <Route
