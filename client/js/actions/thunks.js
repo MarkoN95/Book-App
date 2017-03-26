@@ -156,7 +156,7 @@ const thunks = module.exports = {
           dispatch(updateUser(null));
         },
         final: function() {
-          ownProps.router.push("/login");
+          ownProps.router.push("/");
 
           dispatch(thunks.purgeAjaxResult("searchBooks"));
           dispatch(thunks.purgeAjaxResult("marketplace"));
