@@ -154,8 +154,12 @@ Trade.statics.accept = function(tradeId, accepterId, cb) {
         return cb(errors.tradeNotFoundError());
       }
 
-      if(trade.initiand._id.equals(toObjectId(accepterId))) {
+      if(trade.state.type === "initiated" && trade.initiand._id.equals(toObjectId(accepterId))) {
         return cb(errors.acceptOwnInitiatedTradeError());
+      }
+
+      if(trade.state.type === "negotiate" && trade.state.by.equals(toObjectId(accepterId))) {
+        return cb(errors.acceptOwnInitiatedTradeError(400, "You have to wait for your trade partner to either accept, decline or negotiate further"));
       }
 
       // free books and swap owners
@@ -359,7 +363,6 @@ Trade.statics.negotiate = function(tradeId, negotiatorId, nextStages, cb) {
       if(!trade) {
         return cb(errors.tradeNotFoundError());
       }
-      console.log(trade);
 
       let diffInitiand = diff(trade.initiand_stage, nextStages.initiand);
       let diffAcceptand = diff(trade.acceptand_stage, nextStages.acceptand);
