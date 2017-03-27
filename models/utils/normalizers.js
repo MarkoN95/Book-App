@@ -3,14 +3,14 @@ function normalizeTrades(user) {
     const ilm = trade.initiand.login_method;
     const alm = trade.acceptand.login_method;
     return {
-      id: trade._id,
+      id: trade._id.toString(),
       initiand: {
-        id: trade.initiand._id,
+        id: trade.initiand._id.toString(),
         username: trade.initiand[ilm].username,
         image_url: trade.initiand[ilm].image_url
       },
       acceptand: {
-        id: trade.acceptand._id,
+        id: trade.acceptand._id.toString(),
         username: trade.acceptand[alm].username,
         image_url: trade.acceptand[alm].image_url
       },
@@ -33,7 +33,7 @@ function normalizePublic(user, opt = {}) {
   };
 
   if(opt.id === true) {
-    publicUser.id = user._id;
+    publicUser.id = user._id.toString();
   }
 
   return publicUser;
@@ -57,7 +57,7 @@ const user_normalizers = {
             from: msg.from,
             text: msg.text,
             seen: msg.seen,
-            id: msg._id
+            id: msg._id.toString()
           };
         })
         .sort((a, b) => b.from - a.from)
@@ -79,7 +79,7 @@ const book_normalizers = {
   "default": function(book) {
     const norm = Object.assign({}, book.toObject(), {
       owner: normalizePublic(book.owner, { id: true }),
-      id: book._id
+      id: book._id.toString()
     });
 
     delete norm._id;
@@ -89,7 +89,7 @@ const book_normalizers = {
   },
   ownLibrary: function(book) {
     const norm = Object.assign({}, book.toObject(), {
-      id: book._id
+      id: book._id.toString()
     });
 
     delete norm._id;

@@ -26,7 +26,7 @@ const Book = React.createClass({
       mouseOver: bool
     });
   },
-  limitLength: function(str) {
+  limitLength: function(str = "") {
     return str.length > 25 ? str.substr(0, 20) + "..." : str;
   },
   formatBook: function(book) {

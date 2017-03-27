@@ -6,9 +6,9 @@ const { AppContainer } = require("react-hot-loader");
 
 const routes = require("./routes");
 const configureStore = require("./store/configureStore");
-const initialState = require("./store/initialState");
+const getInitialState = require("./store/getInitialState");
 
-const store = configureStore(initialState);
+const store = configureStore(getInitialState());
 
 const render = (routes) => {
   if(module.hot) {
