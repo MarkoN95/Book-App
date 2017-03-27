@@ -11,17 +11,10 @@ module.exports = function authRoutes(opt) {
   if(!Array.isArray(opt.social)) {
     throw new TypeError("authRoutes() expects social property of config to be an array");
   }
-  
+
   opt.social.forEach((method) => {
     router.get("/auth/" + method, passport.authenticate(method));
-
-    router.get(
-      "/auth/" + method + "/callback",
-      passport.authenticate(method, { failureRedirect: "/login" }),
-      (req, res, next) => {
-        next();
-      }
-    );
+    router.get("/auth/" + method + "/callback", passport.authenticate(method, { successRedirect: "/user", failureRedirect: "/login" }));
   });
 
   router.post("/auth/local/login", check_input("login"), passport.authenticate("local"), (req, res) => {

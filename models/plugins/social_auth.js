@@ -36,6 +36,7 @@ const socialAuhPlugin = function(schema, opt) {
           }
           if(!user) {
             const newUser = new self({
+              login_method: method,
               [method]: {
                 id: profile.id,
                 username: profile.displayName,
