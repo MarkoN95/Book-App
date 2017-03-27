@@ -3,6 +3,7 @@ const PurifyCSSPlugin = require("purifycss-webpack");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const NpmInstallPlugin = require("npm-install-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 exports.HTMLPlugin = function({ template }) {
   return {
@@ -35,7 +36,7 @@ exports.purifyCSS = function({ paths }) {
 exports.clean = function(path) {
   return {
     plugins: [
-      new CleanWebpackPlugin([path])
+      new CleanWebpackPlugin([path], { root: process.cwd() })
     ]
   };
 };
@@ -72,6 +73,14 @@ exports.namedModules = function() {
   return {
     plugins: [
       new webpack.NamedModulesPlugin()
+    ]
+  };
+};
+
+exports.copy = function(patterns) {
+  return {
+    plugins: [
+      new CopyWebpackPlugin(patterns)
     ]
   };
 };

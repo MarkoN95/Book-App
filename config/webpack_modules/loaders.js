@@ -34,18 +34,16 @@ exports.extractCSS = function({ include, exclude, use }) {
           test: /\.css$/,
           include,
           exclude,
-          use: {
-            modules: ExtractTextPlugin.extract({
-              use,
-              fallback: "style-loader"
-            })
-          }
+          use: ExtractTextPlugin.extract({
+            use,
+            fallback: "style-loader"
+          })
         }
       ],
-      plugins: [
-        new ExtractTextPlugin("[name].[contenthash].css")
-      ]
-    }
+    },
+    plugins: [
+      new ExtractTextPlugin("[name].[contenthash].css")
+    ]
   };
 };
 
