@@ -9,8 +9,8 @@ function configureStore(initialState) {
   var devtools;
 
   if(process.env.NODE_ENV !== "production") {
-
-    var w = window;
+    
+    var w = typeof window !== "undefined" ? window : undefined;
     devtools = w && w.devToolsExtension ? w.devToolsExtension() : f => f;
 
     store = createStore(rootReducer, initialState, compose(
