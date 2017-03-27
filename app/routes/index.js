@@ -23,7 +23,7 @@ const assets = require("./serve_bundles.js")({
   path: "/build/client",
   publicPath: "/",
   sort: {
-    scripts: ["styles", "app"]
+    scripts: ["manifest", "vendor", "styles", "app"]
   }
 });
 

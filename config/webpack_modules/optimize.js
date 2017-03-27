@@ -14,13 +14,18 @@ exports.extractBundles = function({ bundles, options }) {
     names.push(name);
   });
 
+  function isVendor(module) {
+    return module.context && module.context.indexOf("node_modules") >= 0;
+  }
+
   return {
+    entry,
     plugins: [
-      new webpack.optimize.CommonsChunkPlugin({
-        options,
-        names,
-        minChunks: module => module.context && module.context.indexOf("node_modules") >= 0
-      })
+      new webpack.optimize.CommonsChunkPlugin(
+        Object.assign({}, options, { names }, {
+          minChunks: isVendor
+        })
+      )
     ]
   };
 };

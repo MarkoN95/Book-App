@@ -79,6 +79,7 @@ const client = {
           chunkFilename: "[chunkhash].js"
         }
       },
+      plugins.hashedModuleIds(),
       plugins.clean(path.join(PATHS.build, "client")),
       loaders.loadJS({ include: [PATHS.app, path.join(__dirname, "models", "utils", "diff.js")] }),
       optimize.minifyCSS({
@@ -114,6 +115,9 @@ const client = {
           {
             name: "vendor",
             entries: VENDORS
+          },
+          {
+            name: "manifest"
           }
         ]
       }),
