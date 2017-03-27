@@ -1,4 +1,5 @@
 const fs = require("fs");
+const StatsWebpackPlugin = require("stats-webpack-plugin");
 
 exports.nodeModules = function({ additionalModules } = { additionalModules: [] }) {
   const externals = {};
@@ -13,5 +14,16 @@ exports.nodeModules = function({ additionalModules } = { additionalModules: [] }
 
   return {
     externals
+  };
+};
+
+exports.createStats = function({ filename, exclude } = {}) {
+  return {
+    plugins: [
+      new StatsWebpackPlugin(filename || "stats/stats.json", {
+        chunkModules: true,
+        exclude
+      })
+    ]
   };
 };
