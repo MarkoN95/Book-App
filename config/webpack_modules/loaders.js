@@ -47,6 +47,19 @@ exports.extractCSS = function({ include, exclude, use }) {
   };
 };
 
+exports.autoprefix = function() {
+  return {
+    loader: "postcss-loader",
+    options: {
+      plugins: function() {
+        return [
+          require("autoprefixer")
+        ];
+      }
+    }
+  };
+};
+
 exports.loadJS = function({ include, exclude }) {
   return {
     module: {

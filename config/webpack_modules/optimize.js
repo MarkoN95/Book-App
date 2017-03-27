@@ -4,9 +4,9 @@ const cssnano = require("cssnano");
 
 exports.extractBundles = function({ bundles, options }) {
   const entry = {};
-  const names = {};
+  const names = [];
 
-  bundles.forEeach(({ name, entries }) => {
+  bundles.forEach(({ name, entries }) => {
     if(entries) {
       entry[name] = entries;
     }

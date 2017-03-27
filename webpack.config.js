@@ -1,6 +1,6 @@
 const path = require("path");
 const merge = require("webpack-merge");
-const { dev, loaders, plugins, utils } = require("./config/parts");
+const { dev, loaders, plugins, utils, optimize } = require("./config/parts");
 
 const PATHS = {
   template: path.join(__dirname, "client", "index.pug"),
@@ -12,6 +12,23 @@ const PATHS = {
   backend: path.join(__dirname, "app"),
   assets: path.join(__dirname, "client", "media")
 };
+
+const VENDORS = [
+  "react",
+  "react-dom",
+  "react-router",
+  "react-bootstrap",
+  "react-router-bootstrap",
+  "redux",
+  "redux-thunk",
+  "react-redux",
+  "axios"
+];
+
+const ADDITIONAL_NODE_EXTERNALS = [
+  "react-dom/server",
+  "async/each"
+];
 
 const common = merge(
   {
@@ -34,11 +51,6 @@ const client = {
         }
       },
       loaders.loadJS({ include: PATHS.app }),
-      loaders.loadImages({
-        options: {
-          name: "images/[name].[ext]"
-        }
-      }),
       loaders.loadPug({ include: PATHS.client }),
       plugins.HTMLPlugin({ template: PATHS.template }),
       dev.devServer({
@@ -68,23 +80,46 @@ const client = {
         }
       },
       plugins.clean(path.join(PATHS.build, "client")),
-      loaders.loadJS({ include: PATHS.app }),
-      loaders.extractCSS({
-        include: PATHS.client,
-        use: {
-          loader: "css-loader",
-          query: {
-            modules: true,
-            localIdentName: "[local]_[hash:base64:5]"
+      loaders.loadJS({ include: [PATHS.app, path.join(__dirname, "models", "utils", "diff.js")] }),
+      optimize.minifyCSS({
+        options: {
+          discardComments: {
+            removeAll: true
           }
         }
+      }),
+      loaders.extractCSS({
+        include: PATHS.client,
+        use: [
+          {
+            loader: "css-loader",
+            query: {
+              modules: true,
+              localIdentName: "[local]_[hash:base64:5]"
+            }
+          },
+          loaders.autoprefix()
+        ]
       }),
       plugins.copy([
         {
           from: PATHS.assets,
           to: path.join(PATHS.build, "client", "client", "media")
         }
-      ])
+      ]),
+      dev.sourceMap({ type: "source-map" }),
+      optimize.minifyJS({ useSourceMap: true }),
+      optimize.extractBundles({
+        bundles: [
+          {
+            name: "vendor",
+            entries: VENDORS
+          }
+        ]
+      }),
+      optimize.setFreeVariables({
+        "process.env.NODE_ENV": "production"
+      })
     );
   }
 };
@@ -109,17 +144,7 @@ const server = {
         }
       },
       loaders.loadJS({ include: [PATHS.app, PATHS.server, PATHS.backend] }),
-      loaders.extractCSS({
-        include: PATHS.client,
-        use: {
-          loader: "css-loader",
-          query: {
-            modules: true,
-            localIdentName: "[local]_[hash:base64:5]"
-          }
-        }
-      }),
-      utils.nodeModules(),
+      utils.nodeModules({ additionalModules: ADDITIONAL_NODE_EXTERNALS }),
       dev.sourceMap({ type: "source-map" }),
       plugins.addStackTrace(),
       plugins.hmr(),
@@ -143,17 +168,7 @@ const server = {
       },
       plugins.clean(path.join(PATHS.build, "server")),
       loaders.loadJS({ include: [PATHS.app, PATHS.server, PATHS.backend] }),
-      loaders.extractCSS({
-        include: PATHS.client,
-        use: {
-          loader: "css-loader",
-          query: {
-            modules: true,
-            localIdentName: "[local]_[hash:base64:5]"
-          }
-        }
-      }),
-      utils.nodeModules(),
+      utils.nodeModules({ additionalModules: ADDITIONAL_NODE_EXTERNALS }),
       dev.sourceMap({ type: "source-map" }),
       plugins.addStackTrace()
     );
@@ -169,6 +184,7 @@ module.exports = function(env) {
         return client.development();
 
       case "start:server":
+        process.env.BABEL_ENV = "server";
         return server.development();
     }
   }
@@ -181,6 +197,7 @@ module.exports = function(env) {
         return client.production();
 
       case "build:server":
+        process.env.BABEL_ENV = "server";
         return server.production();
     }
   }

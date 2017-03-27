@@ -13,6 +13,17 @@
       "plugins": [
         "react-hot-loader/babel"
       ]
+    },
+    "server": {
+      "plugins": [
+        [
+          "css-modules-transform",
+          {
+            "generateScopedName": "[local]_[hash:base64:5]",
+            "extensions": [".css"]
+          }
+        ]
+      ]
     }
   }
 }
