@@ -11,4 +11,4 @@
 * I can update my settings to store my full name, city, and state.
 * I can propose a trade and wait for the other user to accept the trade.
 
-#### Live version coming soon...
+#### Live version running [here](https://btrader.herokuapp.com/)
