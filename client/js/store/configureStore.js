@@ -1,5 +1,5 @@
 const { createStore, applyMiddleware, compose } = require("redux");
-const reduxImmutableStateInvariant = require("redux-immutable-state-invariant");
+const reduxImmutableStateInvariant = require("redux-immutable-state-invariant").default;
 const thunk = require("redux-thunk").default;
 
 const rootReducer = require("../reducers");
@@ -9,7 +9,7 @@ function configureStore(initialState) {
   var devtools;
 
   if(process.env.NODE_ENV !== "production") {
-    
+
     var w = typeof window !== "undefined" ? window : undefined;
     devtools = w && w.devToolsExtension ? w.devToolsExtension() : f => f;
 

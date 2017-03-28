@@ -211,9 +211,12 @@ Trade.statics.accept = function(tradeId, accepterId, cb) {
                                 if(err) {
                                   return cb(err);
                                 }
+                                const to = trade.initiand._id.equals(toObjectId(accepterId)) ? trade.acceptand._id : trade.initiand._id;
+                                const fromRole = to.equals(trade.initiand._id) ? "acceptand" : "initiand";
+
                                 mongoose.model("user").pushMessage(
-                                  trade.initiand._id,
-                                  trade.acceptand[trade.acceptand.login_method].username + " accepted your trade",
+                                  to,
+                                  trade[fromRole][trade[fromRole].login_method].username + " accepted your offer",
                                   (err) => {
                                     if(err) {
                                       return cb(err);
