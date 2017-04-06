@@ -108,6 +108,13 @@ User.statics.changePassword = function(userId, data, cb) {
       if(err) {
         return cb(err);
       }
+
+      if(!user || user.login_method !== "local") {
+        if(user && user.login_method !== "local") {
+          return cb(errors.userNotFoundError(400, "Only local accounts can change their password"));
+        }
+        return cb(errors.userNotFoundError());
+      }
       user.validatePassword(data.old_pw, (err, status) => {
         if(err) {
           return cb(err);

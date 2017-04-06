@@ -31,12 +31,20 @@ module.exports = {
       status: status || 400
     };
   },
+  userNotFoundError: function(status, msg) {
+    return {
+      error: {
+        message: msg || "Matching user not found"
+      },
+      status: status || 400
+    };
+  },
   passwordsDontMatchError: function(status, msg) {
     return {
       error: {
         message: msg || "Passwords don't match"
       },
-      status: status || 400,
+      status: status || 400
     };
   },
   wrongOldPasswordError: function(status, msg) {
@@ -44,7 +52,7 @@ module.exports = {
       error: {
         message: msg || "Old password is not correct"
       },
-      status: status || 400,
+      status: status || 400
     };
   },
   invalidQueryError: function(status, msg) {
